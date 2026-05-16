@@ -4,6 +4,8 @@ import Link from "next/link";
 import { getPlayers, getPlayerBySlug, toSlug } from "@/lib/data";
 
 
+export const revalidate = 3600;
+
 export async function generateStaticParams() {
   const players = await getPlayers();
   return players.map(p => ({ slug: toSlug(p.name) }));

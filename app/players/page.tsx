@@ -4,6 +4,8 @@ import PlayerTable from "@/components/PlayerTable";
 
 export const metadata: Metadata = { title: "All-Time Players" };
 
+export const revalidate = 3600;
+
 export default async function PlayersPage() {
   const players = await getPlayers();
   const sorted  = [...players].sort((a, b) => b.caps - a.caps);

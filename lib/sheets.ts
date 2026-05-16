@@ -7,7 +7,9 @@ type Row = Record<string, string>;
 
 async function fetchFromGoogle(tab: string): Promise<Row[]> {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(tab)}?key=${API_KEY}`;
-  const res = await fetch(url, { cache: "no-store" });
+  const res = await fetch(url, {
+    next: { tags: ["sheets"], revalidate: 3600 }, // cache for 1hr, bust via revalidateTag
+  });
   if (!res.ok) throw new Error(`Sheets API ${res.status} for "${tab}"`);
 
   const json = await res.json() as { values?: string[][] };

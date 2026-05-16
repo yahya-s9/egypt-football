@@ -22,6 +22,8 @@ function formatDate(date: string) {
   } catch { return date; }
 }
 
+export const revalidate = 3600;
+
 export default async function Home() {
   const [players, matches] = await Promise.all([getPlayers(), getMatchesWithScorers()]);
   const recent = matches.slice(0, 6);

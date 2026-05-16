@@ -130,6 +130,8 @@ function StickerCard({ player, index }: { player: Player; index: number }) {
   );
 }
 
+export const revalidate = 3600;
+
 export default async function HallOfFamePage() {
   const players = await getPlayers();
   const sorted  = [...players].sort((a, b) => b.caps - a.caps);
