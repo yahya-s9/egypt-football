@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getPlayers, getPlayerBySlug, toSlug } from "@/lib/data";
 
-export const revalidate = 3600;
 
 export async function generateStaticParams() {
   const players = await getPlayers();

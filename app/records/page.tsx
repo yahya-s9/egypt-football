@@ -3,7 +3,6 @@ import Link from "next/link";
 import { getRecords, toSlug } from "@/lib/data";
 
 export const metadata: Metadata = { title: "All-Time Records" };
-export const revalidate = 3600;
 
 export default async function RecordsPage() {
   const { totalMatches, wins, draws, losses, mostCapped, topScorers, byCompetition, headToHead } = await getRecords();

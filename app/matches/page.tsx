@@ -3,7 +3,6 @@ import { getMatchesWithScorers } from "@/lib/data";
 import MatchTable from "@/components/MatchTable";
 
 export const metadata: Metadata = { title: "Match History" };
-export const revalidate = 3600;
 
 export default async function MatchesPage() {
   const matches = await getMatchesWithScorers();

@@ -4,7 +4,6 @@ import { getPlayers, toSlug } from "@/lib/data";
 import type { Player } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Hall of Fame" };
-export const revalidate = 3600;
 
 // Deterministic tilt: varies per card but is always the same
 function tiltDeg(index: number): number {

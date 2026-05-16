@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { getMatchesWithScorers, getPlayers } from "@/lib/data";
 
-export const revalidate = 3600;
 
 function resultClass(eg: number, opp: number) {
   if (eg > opp) return "text-green-600 font-bold";
