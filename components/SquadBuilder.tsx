@@ -194,9 +194,10 @@ function PitchMarkings() {
 // ── Player selector modal ──────────────────────────────────────────────────
 
 function PlayerSelector({
-  players, onSelect, onCustom, onClose,
+  players, usedIds, onSelect, onCustom, onClose,
 }: {
   players: Player[];
+  usedIds: Set<string>;
   onSelect: (p: Player) => void;
   onCustom: (name: string) => void;
   onClose: () => void;
@@ -246,11 +247,14 @@ function PlayerSelector({
               {filtered.length === 0 && (
                 <p className="px-4 py-4 text-eg-muted text-sm text-center">No players found</p>
               )}
-              {filtered.map(p => (
+              {filtered.map(p => {
+                const inSquad = usedIds.has(p.id);
+                return (
                 <button
                   key={p.id}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-eg-surface-2 transition-colors text-left"
-                  onClick={() => onSelect(p)}
+                  disabled={inSquad}
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 transition-colors text-left ${inSquad ? "opacity-35 cursor-not-allowed" : "hover:bg-eg-surface-2"}`}
+                  onClick={() => !inSquad && onSelect(p)}
                 >
                   {/* Mini avatar */}
                   <div className="w-8 h-8 rounded-full overflow-hidden bg-eg-bg border border-eg-border shrink-0 flex items-center justify-center">
@@ -268,11 +272,12 @@ function PlayerSelector({
                       {p.caps} caps · {p.clubs.map(c => c.clubName).join(", ")}
                     </div>
                   </div>
-                  <span className="bg-eg-red text-white font-bold text-xs px-2 py-0.5 rounded-full shrink-0">
-                    {p.caps}
+                  <span className={`font-bold text-xs px-2 py-0.5 rounded-full shrink-0 ${inSquad ? "bg-eg-border text-eg-muted" : "bg-eg-red text-white"}`}>
+                    {inSquad ? "✓" : p.caps}
                   </span>
                 </button>
-              ))}
+                );
+              })}
             </div>
 
             {/* Custom name option */}
@@ -551,6 +556,11 @@ export default function SquadBuilder({ players }: { players: Player[] }) {
       {activeSlot && (
         <PlayerSelector
           players={players}
+          usedIds={new Set(
+            Object.entries(squad)
+              .filter(([posId, p]) => p && posId !== activeSlot && !p.isCustom)
+              .map(([, p]) => p!.id)
+          )}
           onSelect={assignPlayer}
           onCustom={assignCustom}
           onClose={() => setActiveSlot(null)}
