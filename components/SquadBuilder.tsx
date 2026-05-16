@@ -26,10 +26,10 @@ const POSITIONS = [
   { id: "LCM", label: "LCM", x: 18, y: 36 },
   { id: "CM",  label: "CM",  x: 50, y: 34 },
   { id: "RCM", label: "RCM", x: 82, y: 36 },
-  { id: "LB",  label: "LB",  x: 9,  y: 61 },
+  { id: "LB",  label: "LB",  x: 11, y: 61 },
   { id: "LCB", label: "LCB", x: 31, y: 64 },
   { id: "RCB", label: "RCB", x: 69, y: 64 },
-  { id: "RB",  label: "RB",  x: 91, y: 61 },
+  { id: "RB",  label: "RB",  x: 89, y: 61 },
   { id: "GK",  label: "GK",  x: 50, y: 85 },
 ];
 
@@ -90,29 +90,29 @@ function MiniCard({
           outline: isDropTarget ? "2px solid #C8A84B" : "none",
         }}
       >
-        <div className="overflow-hidden rounded-[2px]" style={{ width: 76 }}>
+        <div className="overflow-hidden rounded-[2px]" style={{ width: 94 }}>
           {/* Red header */}
-          <div className="bg-eg-red flex items-center justify-between px-1.5 py-[3px]">
-            <span className="text-white font-black tracking-widest uppercase" style={{ fontSize: 8 }}>{posLabel}</span>
-            <span style={{ fontSize: 10 }}>🇪🇬</span>
+          <div className="bg-eg-red flex items-center justify-between px-2 py-1">
+            <span className="text-white font-black tracking-widest uppercase" style={{ fontSize: 9 }}>{posLabel}</span>
+            <span style={{ fontSize: 12 }}>🇪🇬</span>
           </div>
           {/* Photo */}
           <div
             className="relative overflow-hidden flex items-center justify-center"
-            style={{ height: 68, background: "linear-gradient(160deg,#8B0018 0%,#3a000a 60%,#000 100%)" }}
+            style={{ height: 88, background: "linear-gradient(160deg,#8B0018 0%,#3a000a 60%,#000 100%)" }}
           >
             {player.photoUrl ? (
               <img src={player.photoUrl} alt={player.name} className="w-full h-full object-cover object-top" />
             ) : (
-              <span className="font-black text-white/10 leading-none" style={{ fontSize: 46 }}>{initials}</span>
+              <span className="font-black text-white/10 leading-none" style={{ fontSize: 58 }}>{initials}</span>
             )}
-            <div className="absolute inset-x-0 bottom-0 h-5 bg-gradient-to-t from-black/80 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-black/80 to-transparent" />
           </div>
           {/* Footer */}
-          <div className="bg-black px-1.5 pt-1 pb-1.5">
-            <div className="text-eg-red leading-none tracking-widest uppercase" style={{ fontSize: 7 }}>{firstName}</div>
-            <div className="text-white font-black uppercase leading-tight truncate" style={{ fontSize: 11 }}>{lastName}</div>
-            <div className="text-eg-gold leading-none mt-0.5" style={{ fontSize: 7 }}>
+          <div className="bg-black px-2 pt-1.5 pb-2">
+            <div className="text-eg-red leading-none tracking-widest uppercase" style={{ fontSize: 8 }}>{firstName}</div>
+            <div className="text-white font-black uppercase leading-tight truncate" style={{ fontSize: 13 }}>{lastName}</div>
+            <div className="text-eg-gold leading-none mt-0.5" style={{ fontSize: 8 }}>
               {player.isCustom ? "—" : `${player.caps} caps`}
             </div>
           </div>
@@ -146,8 +146,8 @@ function EmptySlot({
     <button
       className="flex flex-col items-center justify-center rounded-sm transition-all"
       style={{
-        width: 76,
-        height: 107,
+        width: 94,
+        height: 132,
         border: isDropTarget ? "2px solid #C8A84B" : "2px dashed rgba(255,255,255,0.35)",
         background: isDropTarget ? "rgba(200,168,75,0.15)" : "rgba(255,255,255,0.04)",
         color: isDropTarget ? "#C8A84B" : "rgba(255,255,255,0.5)",
@@ -429,17 +429,17 @@ export default function SquadBuilder({ players }: { players: Player[] }) {
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        <div className="flex flex-col lg:flex-row gap-8 items-start justify-center">
+      <main className="px-4 sm:px-6 py-8">
+        <div className="flex flex-col items-center">
 
           {/* ── Football pitch ──────────────────────────────────────────── */}
-          <div className="w-full lg:w-auto flex flex-col items-center">
+          <div className="w-full flex flex-col items-center">
             <div
               className="relative rounded-xl overflow-hidden shadow-2xl w-full"
               style={{
-                maxWidth: 500,
+                maxWidth: 700,
                 aspectRatio: "3 / 4.2",
-                background: "repeating-linear-gradient(180deg, #2d6a1a 0px, #2d6a1a 36px, #338020 36px, #338020 72px)",
+                background: "repeating-linear-gradient(180deg, #2d6a1a 0px, #2d6a1a 48px, #338020 48px, #338020 96px)",
               }}
             >
               <PitchMarkings />
@@ -487,7 +487,7 @@ export default function SquadBuilder({ players }: { players: Player[] }) {
             </div>
 
             {/* Controls */}
-            <div className="flex items-center gap-3 mt-5 w-full" style={{ maxWidth: 500 }}>
+            <div className="flex items-center gap-3 mt-5 w-full" style={{ maxWidth: 700 }}>
               <button
                 onClick={handleShare}
                 className="flex-1 flex items-center justify-center gap-2 bg-eg-red hover:bg-eg-red-hover text-white font-bold text-xs py-3 rounded-xl transition-colors tracking-wider uppercase shadow-sm"
@@ -505,48 +505,49 @@ export default function SquadBuilder({ players }: { players: Player[] }) {
             <p className="text-eg-muted text-xs mt-3 text-center">
               Click a slot to add a player · Drag cards to swap positions
             </p>
-          </div>
 
-          {/* ── Squad list (right panel) ────────────────────────────────── */}
-          <div className="w-full lg:w-72 bg-white rounded-xl border border-eg-border shadow-sm overflow-hidden">
-            <div className="h-1 bg-eg-red" />
-            <div className="px-5 py-4 border-b border-eg-border">
-              <h2 className="section-heading">Your Squad</h2>
+            {/* ── Squad list (below pitch) ──────────────────────────────── */}
+            <div className="w-full mt-6 bg-white rounded-xl border border-eg-border shadow-sm overflow-hidden" style={{ maxWidth: 700 }}>
+              <div className="h-1 bg-eg-red" />
+              <div className="px-5 py-3 border-b border-eg-border flex items-center justify-between">
+                <h2 className="section-heading">Your Squad</h2>
+                <span className="text-xs text-eg-muted">{filledCount} / 11 players</span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+                {POSITIONS.map((pos, i) => {
+                  const player = squad[pos.id];
+                  return (
+                    <div
+                      key={pos.id}
+                      className={`flex items-center gap-2.5 px-4 py-2.5 border-b border-eg-border hover:bg-eg-surface-2 transition-colors cursor-pointer ${i % 2 === 0 ? "" : "border-l border-eg-border"}`}
+                      onClick={() => setActiveSlot(pos.id)}
+                    >
+                      <span className="text-eg-red font-black text-xs w-8 shrink-0">{pos.label}</span>
+                      {player ? (
+                        <>
+                          <div className="w-6 h-6 rounded-full overflow-hidden bg-eg-bg border border-eg-border shrink-0 flex items-center justify-center">
+                            {player.photoUrl ? (
+                              <img src={player.photoUrl} alt={player.name} className="w-full h-full object-cover object-top" />
+                            ) : (
+                              <span className="text-[8px] font-black text-eg-muted">
+                                {player.name.split(" ").map((w: string) => w[0]).join("").slice(0, 2)}
+                              </span>
+                            )}
+                          </div>
+                          <span className="font-semibold text-xs text-eg-text flex-1 truncate">{player.name}</span>
+                          <button
+                            className="text-eg-subtle hover:text-eg-red transition-colors text-sm shrink-0 ml-1"
+                            onClick={e => { e.stopPropagation(); removePlayer(pos.id); }}
+                          >×</button>
+                        </>
+                      ) : (
+                        <span className="text-eg-subtle text-xs italic">Empty</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-            {POSITIONS.map(pos => {
-              const player = squad[pos.id];
-              return (
-                <div
-                  key={pos.id}
-                  className="flex items-center gap-3 px-5 py-2.5 border-b border-eg-border last:border-0 hover:bg-eg-surface-2 transition-colors cursor-pointer"
-                  onClick={() => setActiveSlot(pos.id)}
-                >
-                  <span className="text-eg-red font-black text-xs w-9 shrink-0">{pos.label}</span>
-                  {player ? (
-                    <>
-                      <div className="w-7 h-7 rounded-full overflow-hidden bg-eg-bg border border-eg-border shrink-0 flex items-center justify-center">
-                        {player.photoUrl ? (
-                          <img src={player.photoUrl} alt={player.name} className="w-full h-full object-cover object-top" />
-                        ) : (
-                          <span className="text-[9px] font-black text-eg-muted">
-                            {player.name.split(" ").map((w: string) => w[0]).join("").slice(0, 2)}
-                          </span>
-                        )}
-                      </div>
-                      <span className="font-semibold text-sm text-eg-text flex-1 truncate">{player.name}</span>
-                      <button
-                        className="text-eg-muted hover:text-eg-red transition-colors text-sm shrink-0"
-                        onClick={e => { e.stopPropagation(); removePlayer(pos.id); }}
-                      >
-                        ×
-                      </button>
-                    </>
-                  ) : (
-                    <span className="text-eg-subtle text-xs italic">Empty — click to add</span>
-                  )}
-                </div>
-              );
-            })}
           </div>
 
         </div>
