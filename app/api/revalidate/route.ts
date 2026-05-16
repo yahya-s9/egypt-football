@@ -1,4 +1,4 @@
-import { revalidateTag } from "next/cache";
+import { revalidateTag, revalidatePath } from "next/cache";
 import type { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -8,7 +8,11 @@ export async function GET(request: NextRequest) {
     return Response.json({ error: "Invalid token" }, { status: 401 });
   }
 
+  // Invalidate the data cache
   revalidateTag("sheets", { expire: 0 });
+
+  // Also purge the page cache for every route
+  revalidatePath("/", "layout");
 
   return Response.json({ revalidated: true, timestamp: new Date().toISOString() });
 }
