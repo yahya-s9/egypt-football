@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local oauth token (do not commit)
+scripts/token.json
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
