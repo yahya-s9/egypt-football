@@ -8,7 +8,8 @@ const links = [
   { href: "/players",      label: "Players" },
   { href: "/matches",      label: "Matches" },
   { href: "/records",      label: "Records" },
-  { href: "/hall-of-fame", label: "Hall of Fame" },
+  { href: "/hall-of-fame",   label: "Hall of Fame" },
+  { href: "/squad-builder", label: "Squad Builder" },
 ];
 
 export default function NavBar() {
