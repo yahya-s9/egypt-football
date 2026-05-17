@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getPlayers, getPlayerBySlug, toSlug } from "@/lib/data";
+import { extractTransfermarktId, getMarketValue } from "@/lib/transfermarkt";
+import MarketValueChart from "@/components/MarketValueChart";
 
 
 export const revalidate = 3600;
@@ -33,6 +35,9 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
   const { slug } = await params;
   const player = await getPlayerBySlug(slug);
   if (!player) notFound();
+
+  const tmId = player.transfermarktUrl ? extractTransfermarktId(player.transfermarktUrl) : null;
+  const marketValue = tmId ? await getMarketValue(tmId) : null;
 
   const initials = player.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
 
@@ -130,6 +135,25 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Market value chart */}
+      {marketValue && marketValue.history.length > 1 && (
+        <div className="mb-6 bg-white rounded-xl border border-eg-border shadow-sm p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="section-heading">Market Value History</h2>
+            {player.transfermarktUrl && (
+              <a href={player.transfermarktUrl} target="_blank" rel="noopener noreferrer"
+                className="text-xs text-eg-red hover:underline font-semibold">
+                View on Transfermarkt ↗
+              </a>
+            )}
+          </div>
+          <MarketValueChart
+            history={marketValue.history}
+            currentValue={marketValue.currentValue}
+          />
         </div>
       )}
 
