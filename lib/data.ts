@@ -128,6 +128,11 @@ export async function getPlayers(): Promise<Player[]> {
     });
 }
 
+export async function getMatchById(id: string): Promise<Match | null> {
+  const matches = await getMatches();
+  return matches.find(m => m.id === id) ?? null;
+}
+
 // ── Joined helpers ────────────────────────────────────────────────────────────
 
 // Kept for API compatibility — Match already has lineup so this is a no-op join.

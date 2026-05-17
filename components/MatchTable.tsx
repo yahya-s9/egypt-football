@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
 import type { MatchWithScorers } from "@/lib/types";
 
 function ResultBadge({ eg, opp }: { eg: number; opp: number }) {
@@ -89,7 +90,9 @@ export default function MatchTable({ matches }: { matches: MatchWithScorers[] })
                 <tr key={m.id} className={`border-b border-eg-border last:border-0 hover:bg-eg-surface-2 transition-colors ${i % 2 === 1 ? "bg-eg-bg/40" : ""}`}>
                   <td className="px-4 py-3 text-eg-muted text-xs tabular-nums whitespace-nowrap">{formatDate(m.date)}</td>
                   <td className="px-4 py-3 font-semibold text-eg-text whitespace-nowrap">
-                    {m.isHome ? "" : <span className="text-eg-muted text-xs mr-1">@</span>}{m.opponent}
+                    <Link href={`/matches/${m.id}`} className="hover:text-eg-red transition-colors">
+                      {m.isHome ? "" : <span className="text-eg-muted text-xs mr-1">@</span>}{m.opponent}
+                    </Link>
                   </td>
                   <td className="px-4 py-3 text-center font-black tabular-nums whitespace-nowrap text-eg-text">{m.egyptGoals}–{m.opponentGoals}</td>
                   <td className="px-4 py-3 text-center"><ResultBadge eg={m.egyptGoals} opp={m.opponentGoals} /></td>
