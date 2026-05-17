@@ -9,12 +9,20 @@ export type Player = {
   name: string;
   birthYear: number;
   birthCity: string;
-  caps: number;
+  caps: number;           // auto-calculated from lineup data; falls back to playerCaps column
   primaryCountry: string;
   countries: string[];
   photoUrl: string;
   transfermarktUrl: string;
   clubs: Club[];
+};
+
+// One entry per player in the starting XI for a match.
+// Format in sheet:  "Mohamed Salah (2), Mostafa Mohamed (1), Omar Marmoush"
+// goals = 0 means the player appeared but didn't score.
+export type LineupEntry = {
+  playerName: string;
+  goals: number;
 };
 
 export type Match = {
@@ -27,15 +35,8 @@ export type Match = {
   venue: string;
   city: string;
   isHome: boolean;
+  lineup: LineupEntry[];  // parsed from the "lineup" column
 };
 
-export type Goal = {
-  matchId: string;
-  playerId: string;
-  playerName: string;
-  type: "goal" | "assist" | "og";
-  minute: number;
-};
-
-export type MatchWithScorers = Match & { scorers: Goal[] };
-export type PlayerWithAppearances = Player & { appearances: MatchWithScorers[] };
+export type MatchWithScorers = Match; // lineup already contains scorer info
+export type PlayerWithAppearances = Player & { appearances: Match[] };

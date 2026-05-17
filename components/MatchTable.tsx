@@ -84,7 +84,7 @@ export default function MatchTable({ matches }: { matches: MatchWithScorers[] })
               <tr><td colSpan={7} className="px-4 py-12 text-center text-eg-muted text-sm">No matches found.</td></tr>
             )}
             {filtered.map((m, i) => {
-              const scorers = m.scorers.filter(g => g.type === "goal");
+              const scorers = m.lineup.filter(e => e.goals > 0);
               return (
                 <tr key={m.id} className={`border-b border-eg-border last:border-0 hover:bg-eg-surface-2 transition-colors ${i % 2 === 1 ? "bg-eg-bg/40" : ""}`}>
                   <td className="px-4 py-3 text-eg-muted text-xs tabular-nums whitespace-nowrap">{formatDate(m.date)}</td>
@@ -96,7 +96,9 @@ export default function MatchTable({ matches }: { matches: MatchWithScorers[] })
                   <td className="px-4 py-3 text-eg-muted text-xs hidden sm:table-cell whitespace-nowrap">{m.competition}</td>
                   <td className="px-4 py-3 text-eg-muted text-xs hidden md:table-cell">{m.venue}{m.city ? `, ${m.city}` : ""}</td>
                   <td className="px-4 py-3 text-xs text-eg-muted hidden lg:table-cell">
-                    {scorers.length > 0 ? scorers.map(g => `${g.playerName} ${g.minute}'`).join(", ") : "—"}
+                    {scorers.length > 0
+                      ? scorers.map(e => e.goals > 1 ? `${e.playerName} (${e.goals})` : e.playerName).join(", ")
+                      : "—"}
                   </td>
                 </tr>
               );

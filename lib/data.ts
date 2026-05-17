@@ -1,5 +1,5 @@
 import { fetchSheet } from "./sheets";
-import type { Player, Match, Goal, MatchWithScorers, PlayerWithAppearances } from "./types";
+import type { Player, Match, LineupEntry, PlayerWithAppearances } from "./types";
 
 export function toSlug(name: string): string {
   return name
@@ -10,44 +10,26 @@ export function toSlug(name: string): string {
     .replace(/^-|-$/g, "");
 }
 
-// ── Players ─────────────────────────────────────────────────────────────────
-// Sheet tab: "Players"
-// Headers:   playerName · playerBirthYear · playerBirthCity · playerCountries · playerClubs · playerCaps
-// Optional:  photoUrl
+// ── Lineup parser ────────────────────────────────────────────────────────────
+// Parses: "Mohamed Salah (2), Mostafa Mohamed (1), Omar Marmoush"
+// into:   [{ playerName: "Mohamed Salah", goals: 2 }, ...]
 
-export async function getPlayers(): Promise<Player[]> {
-  const rows = await fetchSheet("Players");
-  return rows
-    .filter((r) => r.playerName?.trim())
-    .map((row) => {
-      const name = row.playerName.trim();
-      const countries = (row.playerCountries ?? "")
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
-      const clubs = (row.playerClubs ?? "")
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
-      return {
-        id: toSlug(name),
-        name,
-        birthYear: parseInt(row.playerBirthYear) || 0,
-        birthCity: row.playerBirthCity?.trim() ?? "",
-        caps: parseInt(row.playerCaps) || 0,
-        primaryCountry: countries[0] ?? "Egypt",
-        countries,
-        photoUrl: row.photoUrl?.trim() ?? "",
-        transfermarktUrl: row.transfermarktUrl?.trim() ?? "",
-        clubs: clubs.map((c) => ({ clubName: c, clubCountry: "", yearsActive: "" })),
-      };
-    });
+export function parseLineup(str: string): LineupEntry[] {
+  if (!str?.trim()) return [];
+  return str
+    .split(",")
+    .map(entry => {
+      const trimmed = entry.trim();
+      const m = trimmed.match(/^(.+?)(?:\s*\((\d+)\))?$/);
+      if (!m) return null;
+      return { playerName: m[1].trim(), goals: m[2] ? parseInt(m[2]) : 0 };
+    })
+    .filter((e): e is LineupEntry => e !== null && e.playerName.length > 0);
 }
 
 // ── Matches ──────────────────────────────────────────────────────────────────
 // Sheet tab: "matches"
-// Headers:   date · opponent · egyptGoals · opponentGoals · competition · venue · city · isHome
-// (no manual id column — generated automatically from date + opponent)
+// Columns:   date · opponent · egyptGoals · opponentGoals · competition · venue · city · isHome · lineup
 
 export function matchId(date: string, opponent: string): string {
   return `${date}-${toSlug(opponent)}`;
@@ -56,8 +38,8 @@ export function matchId(date: string, opponent: string): string {
 export async function getMatches(): Promise<Match[]> {
   const rows = await fetchSheet("matches");
   return rows
-    .filter((r) => r.date && r.opponent)
-    .map((row) => ({
+    .filter(r => r.date && r.opponent)
+    .map(row => ({
       id: matchId(row.date, row.opponent),
       date: row.date.trim(),
       opponent: row.opponent.trim(),
@@ -67,75 +49,104 @@ export async function getMatches(): Promise<Match[]> {
       venue: row.venue?.trim() ?? "",
       city: row.city?.trim() ?? "",
       isHome: ["true", "yes", "1"].includes((row.isHome ?? "").toLowerCase()),
+      lineup: parseLineup(row.lineup ?? ""),
     }))
     .sort((a, b) => b.date.localeCompare(a.date));
 }
 
-// ── Goals ────────────────────────────────────────────────────────────────────
-// Sheet tab: "goals"
-// Headers:   date · opponent · playerName · type · minute
-// (date + opponent identify the match; playerName identifies the scorer)
-// type values: goal | assist | og
+// ── Players ──────────────────────────────────────────────────────────────────
+// Sheet tab: "Players"
+// Columns:   playerName · playerBirthYear · playerBirthCity · playerCountries
+//            · playerClubs · playerCaps · photoUrl · transfermarktUrl
+//
+// Caps are auto-calculated by counting match lineup appearances.
+// The playerCaps column is used as a fallback for players with no lineup data.
 
-export async function getGoals(): Promise<Goal[]> {
-  const rows = await fetchSheet("goals");
-  return rows
-    .filter((r) => r.date && r.opponent && r.playerName)
-    .map((row) => ({
-      matchId: matchId(row.date, row.opponent),
-      playerId: toSlug(row.playerName),
-      playerName: row.playerName.trim(),
-      type: (["goal", "assist", "og"].includes(row.type) ? row.type : "goal") as Goal["type"],
-      minute: parseInt(row.minute) || 0,
-    }));
+export async function getPlayers(): Promise<Player[]> {
+  const [playerRows, matches] = await Promise.all([
+    fetchSheet("Players"),
+    getMatches(),
+  ]);
+
+  // Count appearances per player name slug from lineup data
+  const capCounts: Record<string, number> = {};
+  const goalCounts: Record<string, number> = {};
+  for (const m of matches) {
+    for (const e of m.lineup) {
+      const key = toSlug(e.playerName);
+      capCounts[key] = (capCounts[key] ?? 0) + 1;
+      goalCounts[key] = (goalCounts[key] ?? 0) + e.goals;
+    }
+  }
+
+  return playerRows
+    .filter(r => r.playerName?.trim())
+    .map(row => {
+      const name = row.playerName.trim();
+      const slug = toSlug(name);
+      const countries = (row.playerCountries ?? "")
+        .split(",").map(s => s.trim()).filter(Boolean);
+      const clubs = (row.playerClubs ?? "")
+        .split(",").map(s => s.trim()).filter(Boolean);
+
+      const capsFromLineup = capCounts[slug] ?? 0;
+      const capsFromSheet  = parseInt(row.playerCaps) || 0;
+
+      return {
+        id: slug,
+        name,
+        birthYear: parseInt(row.playerBirthYear) || 0,
+        birthCity: row.playerBirthCity?.trim() ?? "",
+        caps: capsFromLineup > 0 ? capsFromLineup : capsFromSheet,
+        primaryCountry: countries[0] ?? "Egypt",
+        countries,
+        photoUrl: row.photoUrl?.trim() ?? "",
+        transfermarktUrl: row.transfermarktUrl?.trim() ?? "",
+        clubs: clubs.map(c => ({ clubName: c, clubCountry: "", yearsActive: "" })),
+      };
+    });
 }
 
-// ── Joined helpers ───────────────────────────────────────────────────────────
+// ── Joined helpers ────────────────────────────────────────────────────────────
 
-export async function getMatchesWithScorers(): Promise<MatchWithScorers[]> {
-  const [matches, goals] = await Promise.all([getMatches(), getGoals()]);
-  return matches.map((m) => ({
-    ...m,
-    scorers: goals.filter((g) => g.matchId === m.id),
-  }));
+// Kept for API compatibility — Match already has lineup so this is a no-op join.
+export async function getMatchesWithScorers() {
+  return getMatches();
 }
 
 export async function getPlayerBySlug(slug: string): Promise<PlayerWithAppearances | null> {
-  const [players, matchesWithScorers] = await Promise.all([
-    getPlayers(),
-    getMatchesWithScorers(),
-  ]);
-  const player = players.find((p) => p.id === slug);
+  const [players, matches] = await Promise.all([getPlayers(), getMatches()]);
+  const player = players.find(p => p.id === slug);
   if (!player) return null;
-  const appearances = matchesWithScorers.filter((m) =>
-    m.scorers.some((g) => toSlug(g.playerName) === slug)
+  const appearances = matches.filter(m =>
+    m.lineup.some(e => toSlug(e.playerName) === slug)
   );
   return { ...player, appearances };
 }
 
-// ── Records ──────────────────────────────────────────────────────────────────
+// ── Records ───────────────────────────────────────────────────────────────────
 
 export async function getRecords() {
-  const [players, matchesWithScorers] = await Promise.all([
-    getPlayers(),
-    getMatchesWithScorers(),
-  ]);
-  const goals = matchesWithScorers.flatMap((m) => m.scorers);
+  const [players, matches] = await Promise.all([getPlayers(), getMatches()]);
 
-  const wins   = matchesWithScorers.filter((m) => m.egyptGoals > m.opponentGoals).length;
-  const draws  = matchesWithScorers.filter((m) => m.egyptGoals === m.opponentGoals).length;
-  const losses = matchesWithScorers.filter((m) => m.egyptGoals < m.opponentGoals).length;
+  const wins   = matches.filter(m => m.egyptGoals > m.opponentGoals).length;
+  const draws  = matches.filter(m => m.egyptGoals === m.opponentGoals).length;
+  const losses = matches.filter(m => m.egyptGoals < m.opponentGoals).length;
 
-  // Goals by player name slug
+  // Goals per player from lineup data
   const goalCounts: Record<string, number> = {};
-  goals.filter((g) => g.type === "goal").forEach((g) => {
-    const key = toSlug(g.playerName);
-    goalCounts[key] = (goalCounts[key] ?? 0) + 1;
-  });
+  for (const m of matches) {
+    for (const e of m.lineup) {
+      if (e.goals > 0) {
+        const key = toSlug(e.playerName);
+        goalCounts[key] = (goalCounts[key] ?? 0) + e.goals;
+      }
+    }
+  }
 
   const topScorers = players
-    .map((p) => ({ player: p, goals: goalCounts[p.id] ?? 0 }))
-    .filter((x) => x.goals > 0)
+    .map(p => ({ player: p, goals: goalCounts[p.id] ?? 0 }))
+    .filter(x => x.goals > 0)
     .sort((a, b) => b.goals - a.goals)
     .slice(0, 20);
 
@@ -143,7 +154,7 @@ export async function getRecords() {
 
   // By competition
   const compMap: Record<string, { p: number; w: number; d: number; l: number; gf: number; ga: number }> = {};
-  for (const m of matchesWithScorers) {
+  for (const m of matches) {
     if (!compMap[m.competition]) compMap[m.competition] = { p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0 };
     const c = compMap[m.competition];
     c.p++; c.gf += m.egyptGoals; c.ga += m.opponentGoals;
@@ -157,7 +168,7 @@ export async function getRecords() {
 
   // Head-to-head
   const oppMap: Record<string, { p: number; w: number; d: number; l: number }> = {};
-  for (const m of matchesWithScorers) {
+  for (const m of matches) {
     if (!oppMap[m.opponent]) oppMap[m.opponent] = { p: 0, w: 0, d: 0, l: 0 };
     const o = oppMap[m.opponent];
     o.p++;
@@ -170,5 +181,5 @@ export async function getRecords() {
     .sort((a, b) => b.p - a.p)
     .slice(0, 15);
 
-  return { totalMatches: matchesWithScorers.length, wins, draws, losses, mostCapped, topScorers, byCompetition, headToHead };
+  return { totalMatches: matches.length, wins, draws, losses, mostCapped, topScorers, byCompetition, headToHead };
 }

@@ -34,9 +34,10 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
   const player = await getPlayerBySlug(slug);
   if (!player) notFound();
 
-  const goals = player.appearances.flatMap(m =>
-    m.scorers.filter(g => g.playerId === player.id && g.type === "goal")
-  );
+  const totalGoals = player.appearances.reduce((sum, m) => {
+    const entry = m.lineup.find(e => toSlug(e.playerName) === slug);
+    return sum + (entry?.goals ?? 0);
+  }, 0);
   const initials = player.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
 
   return (
@@ -92,7 +93,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
         <div className="border-t border-eg-border grid grid-cols-3 divide-x divide-eg-border bg-eg-surface-2">
           {[
             { label: "Caps",      value: player.caps },
-            { label: "Goals",     value: goals.length },
+            { label: "Goals",     value: totalGoals },
             { label: "In Record", value: player.appearances.length },
           ].map(({ label, value }) => (
             <div key={label} className="text-center py-4 px-4">
@@ -134,7 +135,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
               </thead>
               <tbody>
                 {player.appearances.map((m, i) => {
-                  const mine = m.scorers.filter(g => toSlug(g.playerName) === slug);
+                  const entry = m.lineup.find(e => toSlug(e.playerName) === slug);
                   return (
                     <tr key={m.id} className={`border-b border-eg-border last:border-0 hover:bg-eg-surface-2 transition-colors ${i % 2 === 1 ? "bg-eg-bg/40" : ""}`}>
                       <td className="px-4 py-3 text-eg-muted text-xs tabular-nums whitespace-nowrap">{formatDate(m.date)}</td>
@@ -143,12 +144,10 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
                       <td className="px-4 py-3 text-center"><ResultBadge eg={m.egyptGoals} opp={m.opponentGoals} /></td>
                       <td className="px-4 py-3 text-eg-muted text-xs hidden sm:table-cell">{m.competition}</td>
                       <td className="px-4 py-3 text-xs">
-                        {mine.map((g, j) => (
-                          <span key={j} className="inline-flex items-center gap-1 mr-2 text-eg-text">
-                            {g.type === "goal" ? "⚽" : g.type === "assist" ? "🅰️" : "🔴"}
-                            <span className="text-eg-muted">{g.minute}&apos;</span>
-                          </span>
-                        ))}
+                        {entry && entry.goals > 0
+                          ? <span className="font-semibold text-eg-text">⚽ {entry.goals > 1 ? `×${entry.goals}` : ""}</span>
+                          : <span className="text-eg-subtle">—</span>
+                        }
                       </td>
                     </tr>
                   );
