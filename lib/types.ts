@@ -38,8 +38,12 @@ export type Match = {
   venue: string;
   city: string;
   isHome: boolean;
-  lineup: LineupEntry[];  // parsed from the "lineup" column — starting XI
-  subs: LineupEntry[];    // parsed from the "subs" column — substitutes
+  gk: LineupEntry[];          // "gk" column
+  defenders: LineupEntry[];   // "defenders" column
+  midfielders: LineupEntry[]; // "midfielders" column
+  attackers: LineupEntry[];   // "attackers" column
+  subs: LineupEntry[];        // "subs" column
+  lineup: LineupEntry[];      // computed: gk + defenders + midfielders + attackers
 };
 
 export type MatchWithScorers = Match; // lineup already contains scorer info

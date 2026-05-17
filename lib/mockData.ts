@@ -158,7 +158,7 @@ export const MOCK_PLAYERS: Player[] = [
 ];
 
 // Matches include empty lineup/subs since mock data predates that feature
-const NO_LINEUP = { lineup: [], subs: [] };
+const NO_LINEUP = { gk: [], defenders: [], midfielders: [], attackers: [], subs: [], lineup: [] };
 
 export const MOCK_MATCHES: Match[] = [
   { id: "1920-08-28-italy",        date: "1920-08-28", opponent: "Italy",        egyptGoals: 1, opponentGoals: 4, competition: "Olympics 1920",         venue: "Stade Olympique d'Anvers",    city: "Antwerp",       isHome: false, ...NO_LINEUP },
@@ -188,7 +188,10 @@ export const mockSheetData: Record<string, Record<string, string>[]> = {
     venue: m.venue,
     city: m.city,
     isHome: String(m.isHome),
-    lineup: "",
+    gk: "",
+    defenders: "",
+    midfielders: "",
+    attackers: "",
     subs: "",
   })),
   Players: MOCK_PLAYERS.map((p) => ({

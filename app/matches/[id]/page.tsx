@@ -28,64 +28,60 @@ function formatDate(date: string) {
   } catch { return date; }
 }
 
-function ResultBanner({ eg, opp }: { eg: number; opp: number }) {
-  const { label, cls } =
-    eg > opp ? { label: "Victory",   cls: "bg-green-100 text-green-700" } :
-    eg < opp ? { label: "Defeat",    cls: "bg-red-100 text-eg-red"      } :
-               { label: "Draw",      cls: "bg-amber-50 text-amber-600"  };
-  return (
-    <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest ${cls}`}>
-      {label}
-    </span>
-  );
-}
-
-function PlayerRow({
-  entry, players, isSub,
-}: {
-  entry: LineupEntry;
-  players: Player[];
-  isSub: boolean;
-}) {
+function PlayerRow({ entry, players }: { entry: LineupEntry; players: Player[] }) {
   const player = players.find(
     p => p.id === toSlug(entry.playerName) ||
          (p.nickname && toSlug(p.nickname) === toSlug(entry.playerName))
   );
-  const slug = player?.id ?? toSlug(entry.playerName);
 
   return (
-    <div className="flex items-center justify-between py-2.5 border-b border-eg-border last:border-0 group">
-      <div className="flex items-center gap-3">
-        {/* Avatar */}
-        <div className="w-8 h-8 rounded-full overflow-hidden bg-eg-bg border border-eg-border shrink-0 flex items-center justify-center">
+    <div className="flex items-center justify-between py-2 border-b border-eg-border last:border-0">
+      <div className="flex items-center gap-2.5">
+        <div className="w-7 h-7 rounded-full overflow-hidden bg-eg-bg border border-eg-border shrink-0 flex items-center justify-center">
           {player?.photoUrl ? (
             <img src={player.photoUrl} alt={entry.playerName}
               className="w-full h-full object-cover object-top" />
           ) : (
-            <span className="text-[9px] font-black text-eg-muted">
+            <span className="font-black text-eg-muted" style={{ fontSize: 8 }}>
               {entry.playerName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
             </span>
           )}
         </div>
-        <div>
-          <Link
-            href={player ? `/players/${slug}` : "#"}
-            className={`font-semibold text-sm ${player ? "text-eg-text hover:text-eg-red transition-colors" : "text-eg-muted cursor-default"}`}
-          >
-            {player ? player.name : entry.playerName}
+        {player ? (
+          <Link href={`/players/${player.id}`}
+            className="font-semibold text-sm text-eg-text hover:text-eg-red transition-colors">
+            {player.name}
           </Link>
-          {isSub && (
-            <span className="ml-2 text-[10px] font-semibold bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full uppercase tracking-wide">
-              Sub
-            </span>
-          )}
-        </div>
+        ) : (
+          <span className="font-semibold text-sm text-eg-text">{entry.playerName}</span>
+        )}
       </div>
       {entry.goals > 0 && (
-        <span className="text-sm font-semibold text-eg-text shrink-0">
+        <span className="text-sm font-semibold text-eg-text shrink-0 ml-3">
           ⚽{entry.goals > 1 ? ` ×${entry.goals}` : ""}
         </span>
       )}
+    </div>
+  );
+}
+
+function PositionSection({
+  label, entries, players, accent,
+}: {
+  label: string;
+  entries: LineupEntry[];
+  players: Player[];
+  accent: string;
+}) {
+  if (entries.length === 0) return null;
+  return (
+    <div>
+      <div className={`text-[10px] font-black tracking-widest uppercase px-1 mb-1.5 ${accent}`}>
+        {label}
+      </div>
+      {entries.map((e, i) => (
+        <PlayerRow key={i} entry={e} players={players} />
+      ))}
     </div>
   );
 }
@@ -98,108 +94,106 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
   const hasLineup = match.lineup.length > 0 || match.subs.length > 0;
   const scorers = [...match.lineup, ...match.subs].filter(e => e.goals > 0);
 
+  const result =
+    match.egyptGoals > match.opponentGoals ? { label: "Victory", cls: "bg-green-100 text-green-700" } :
+    match.egyptGoals < match.opponentGoals ? { label: "Defeat",  cls: "bg-red-100 text-eg-red"      } :
+                                             { label: "Draw",    cls: "bg-amber-50 text-amber-600"   };
+
   return (
     <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
       <Link href="/matches" className="text-eg-muted text-xs hover:text-eg-red transition-colors mb-6 inline-block">
         ← All Matches
       </Link>
 
-      {/* Match header card */}
+      {/* Result card */}
       <div className="bg-white rounded-xl border border-eg-border shadow-sm overflow-hidden mb-6">
         <div className="h-1 bg-eg-red" />
         <div className="px-6 sm:px-10 py-8">
 
-          {/* Competition + date */}
-          <div className="flex flex-wrap items-center gap-3 mb-5 text-xs text-eg-muted font-semibold uppercase tracking-widest">
+          <div className="flex flex-wrap items-center gap-2 mb-6 text-xs text-eg-muted font-semibold uppercase tracking-widest">
             <span>{match.competition}</span>
             <span className="text-eg-border">·</span>
             <span>{formatDate(match.date)}</span>
-            {match.venue && (
-              <>
-                <span className="text-eg-border">·</span>
-                <span>{match.venue}{match.city ? `, ${match.city}` : ""}</span>
-              </>
-            )}
+            {match.venue && <>
+              <span className="text-eg-border">·</span>
+              <span>{match.venue}{match.city ? `, ${match.city}` : ""}</span>
+            </>}
           </div>
 
           {/* Score */}
-          <div className="flex items-center justify-center gap-6 sm:gap-10 py-4">
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-black text-eg-text">🇪🇬 Egypt</div>
-              <div className="text-eg-muted text-xs mt-1 uppercase tracking-widest">
-                {match.isHome ? "Home" : "Away"}
-              </div>
+          <div className="flex items-center justify-center gap-6 sm:gap-12">
+            <div className="text-center flex-1">
+              <div className="text-xl sm:text-2xl font-black text-eg-text">🇪🇬 Egypt</div>
+              <div className="text-eg-muted text-xs mt-1 uppercase tracking-wide">{match.isHome ? "Home" : "Away"}</div>
             </div>
             <div className="text-center">
               <div className="text-5xl sm:text-7xl font-black text-eg-text tabular-nums leading-none">
                 {match.egyptGoals}–{match.opponentGoals}
               </div>
               <div className="mt-3">
-                <ResultBanner eg={match.egyptGoals} opp={match.opponentGoals} />
+                <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest ${result.cls}`}>
+                  {result.label}
+                </span>
               </div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-black text-eg-text">{match.opponent}</div>
-              <div className="text-eg-muted text-xs mt-1 uppercase tracking-widest">
-                {match.isHome ? "Away" : "Home"}
-              </div>
+            <div className="text-center flex-1">
+              <div className="text-xl sm:text-2xl font-black text-eg-text">{match.opponent}</div>
+              <div className="text-eg-muted text-xs mt-1 uppercase tracking-wide">{match.isHome ? "Away" : "Home"}</div>
             </div>
           </div>
 
-          {/* Scorers summary */}
           {scorers.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-eg-border text-center text-sm text-eg-muted">
-              ⚽{" "}
-              {scorers.map(e =>
-                `${e.playerName}${e.goals > 1 ? ` (${e.goals})` : ""}`
-              ).join(", ")}
+            <div className="mt-5 pt-4 border-t border-eg-border text-center text-sm text-eg-muted">
+              ⚽ {scorers.map(e => `${e.playerName}${e.goals > 1 ? ` (${e.goals})` : ""}`).join(", ")}
             </div>
           )}
         </div>
       </div>
 
-      {/* Lineup */}
+      {/* Lineup + Subs */}
       {hasLineup ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          {/* Starting XI */}
+
+          {/* Starting XI by position */}
           <div className="bg-white rounded-xl border border-eg-border shadow-sm overflow-hidden">
-            <div className="px-5 py-3 border-b border-eg-border flex items-center gap-2">
+            <div className="px-5 py-3 border-b border-eg-border flex items-center justify-between">
               <h2 className="section-heading">Starting XI</h2>
-              <span className="text-eg-muted text-xs">({match.lineup.length})</span>
+              <span className="text-eg-muted text-xs">{match.lineup.length} players</span>
             </div>
-            <div className="px-5">
-              {match.lineup.length === 0 ? (
-                <p className="py-6 text-eg-muted text-sm text-center">No lineup data</p>
-              ) : (
-                match.lineup.map((entry, i) => (
-                  <PlayerRow key={i} entry={entry} players={players} isSub={false} />
-                ))
-              )}
+            <div className="px-5 py-3 space-y-4">
+              <PositionSection label="Goalkeeper"  entries={match.gk}          players={players} accent="text-amber-600" />
+              <PositionSection label="Defenders"   entries={match.defenders}   players={players} accent="text-blue-600"  />
+              <PositionSection label="Midfielders" entries={match.midfielders} players={players} accent="text-green-600" />
+              <PositionSection label="Attackers"   entries={match.attackers}   players={players} accent="text-eg-red"    />
             </div>
           </div>
 
           {/* Substitutes */}
           <div className="bg-white rounded-xl border border-eg-border shadow-sm overflow-hidden">
-            <div className="px-5 py-3 border-b border-eg-border flex items-center gap-2">
+            <div className="px-5 py-3 border-b border-eg-border flex items-center justify-between">
               <h2 className="section-heading">Substitutes</h2>
-              <span className="text-eg-muted text-xs">({match.subs.length})</span>
+              <span className="text-eg-muted text-xs">{match.subs.length} players</span>
             </div>
-            <div className="px-5">
+            <div className="px-5 py-3">
               {match.subs.length === 0 ? (
-                <p className="py-6 text-eg-muted text-sm text-center">No substitutes recorded</p>
+                <p className="py-4 text-eg-muted text-sm text-center">No substitutes recorded</p>
               ) : (
-                match.subs.map((entry, i) => (
-                  <PlayerRow key={i} entry={entry} players={players} isSub={true} />
-                ))
+                match.subs.map((e, i) => <PlayerRow key={i} entry={e} players={players} />)
               )}
             </div>
           </div>
+
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-eg-border shadow-sm p-8 text-center text-eg-muted text-sm">
-          No lineup data recorded for this match yet.
+          No lineup recorded for this match yet.
           <br />
-          <span className="text-xs mt-1 block">Add a <code className="bg-eg-bg px-1 rounded">lineup</code> column to your matches sheet to track it.</span>
+          <span className="text-xs mt-1 block text-eg-subtle">
+            Add <code className="bg-eg-bg px-1 rounded">gk</code>,{" "}
+            <code className="bg-eg-bg px-1 rounded">defenders</code>,{" "}
+            <code className="bg-eg-bg px-1 rounded">midfielders</code>,{" "}
+            <code className="bg-eg-bg px-1 rounded">attackers</code> columns to your matches sheet.
+          </span>
         </div>
       )}
     </main>

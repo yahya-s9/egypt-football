@@ -49,8 +49,15 @@ export async function getMatches(): Promise<Match[]> {
       venue: row.venue?.trim() ?? "",
       city: row.city?.trim() ?? "",
       isHome: ["true", "yes", "1"].includes((row.isHome ?? "").toLowerCase()),
-      lineup: parseLineup(row.lineup ?? ""),
-      subs:   parseLineup(row.subs   ?? ""),
+      gk:          parseLineup(row.gk          ?? ""),
+      defenders:   parseLineup(row.defenders   ?? ""),
+      midfielders: parseLineup(row.midfielders ?? ""),
+      attackers:   parseLineup(row.attackers   ?? ""),
+      subs:        parseLineup(row.subs        ?? ""),
+      // computed convenience field — used everywhere that previously used lineup
+      get lineup() {
+        return [...this.gk, ...this.defenders, ...this.midfielders, ...this.attackers];
+      },
     }))
     .sort((a, b) => b.date.localeCompare(a.date));
 }
