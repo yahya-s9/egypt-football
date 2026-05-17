@@ -157,15 +157,17 @@ function fromPlayer(p: Player): AssignedPlayer {
 }
 
 // ── Mini FIFA card ─────────────────────────────────────────────────────────
+// cardW drives all dimensions so cards scale with the pitch container.
 
 function MiniCard({
-  player, posLabel, isDragging, isDropTarget,
+  player, posLabel, isDragging, isDropTarget, cardW,
   onRemove, onDragStart, onDragEnd, onDragOver, onDrop,
 }: {
   player: AssignedPlayer;
   posLabel: string;
   isDragging: boolean;
   isDropTarget: boolean;
+  cardW: number;
   onRemove: () => void;
   onDragStart: (e: React.DragEvent) => void;
   onDragEnd: () => void;
@@ -175,6 +177,7 @@ function MiniCard({
   const lastName = player.name.split(" ").slice(1).join(" ") || player.name;
   const firstName = player.name.split(" ")[0];
   const initials = player.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+  const s = cardW / 94; // scale factor
 
   return (
     <div
@@ -191,48 +194,43 @@ function MiniCard({
         transition: "opacity 0.15s, filter 0.15s",
       }}
     >
-      {/* White sticker frame */}
       <div
         className="rounded-sm shadow-xl"
         style={{
           background: isDropTarget ? "#fffbe6" : "#fff",
-          padding: 4,
+          padding: Math.round(4 * s),
           outline: isDropTarget ? "2px solid #C8A84B" : "none",
         }}
       >
-        <div className="overflow-hidden rounded-[2px]" style={{ width: 94 }}>
-          {/* Red header */}
-          <div className="bg-eg-red flex items-center justify-between px-2 py-1">
-            <span className="text-white font-black tracking-widest uppercase" style={{ fontSize: 9 }}>{posLabel}</span>
-            <span style={{ fontSize: 12 }}>🇪🇬</span>
+        <div className="overflow-hidden rounded-[2px]" style={{ width: cardW }}>
+          <div className="bg-eg-red flex items-center justify-between" style={{ padding: `${Math.round(3*s)}px ${Math.round(6*s)}px` }}>
+            <span className="text-white font-black tracking-widest uppercase" style={{ fontSize: Math.max(6, Math.round(9 * s)) }}>{posLabel}</span>
+            <span style={{ fontSize: Math.max(8, Math.round(12 * s)) }}>🇪🇬</span>
           </div>
-          {/* Photo */}
           <div
             className="relative overflow-hidden flex items-center justify-center"
-            style={{ height: 88, background: "linear-gradient(160deg,#8B0018 0%,#3a000a 60%,#000 100%)" }}
+            style={{ height: Math.round(88 * s), background: "linear-gradient(160deg,#8B0018 0%,#3a000a 60%,#000 100%)" }}
           >
             {player.photoUrl ? (
               <img src={player.photoUrl} alt={player.name} className="w-full h-full object-cover object-top" />
             ) : (
-              <span className="font-black text-white/10 leading-none" style={{ fontSize: 58 }}>{initials}</span>
+              <span className="font-black text-white/10 leading-none" style={{ fontSize: Math.round(58 * s) }}>{initials}</span>
             )}
-            <div className="absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-black/80 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent" style={{ height: Math.round(20 * s) }} />
           </div>
-          {/* Footer */}
-          <div className="bg-black px-2 pt-1.5 pb-2">
-            <div className="text-eg-red leading-none tracking-widest uppercase" style={{ fontSize: 8 }}>{firstName}</div>
-            <div className="text-white font-black uppercase leading-tight truncate" style={{ fontSize: 13 }}>{lastName}</div>
-            <div className="text-eg-gold leading-none mt-0.5" style={{ fontSize: 8 }}>
+          <div className="bg-black" style={{ padding: `${Math.round(5*s)}px ${Math.round(6*s)}px ${Math.round(6*s)}px` }}>
+            <div className="text-eg-red leading-none tracking-widest uppercase" style={{ fontSize: Math.max(5, Math.round(8 * s)) }}>{firstName}</div>
+            <div className="text-white font-black uppercase leading-tight truncate" style={{ fontSize: Math.max(8, Math.round(13 * s)) }}>{lastName}</div>
+            <div className="text-eg-gold leading-none" style={{ fontSize: Math.max(5, Math.round(8 * s)), marginTop: Math.round(2*s) }}>
               {player.isCustom ? "—" : `${player.caps} caps`}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Remove ✕ */}
       <button
-        className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-eg-red text-white font-black flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-20"
-        style={{ fontSize: 11 }}
+        className="absolute -top-2 -right-2 rounded-full bg-eg-red text-white font-black flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-20"
+        style={{ width: Math.max(16, Math.round(20*s)), height: Math.max(16, Math.round(20*s)), fontSize: Math.max(9, Math.round(11*s)) }}
         onClick={e => { e.stopPropagation(); onRemove(); }}
       >
         ×
@@ -244,20 +242,22 @@ function MiniCard({
 // ── Empty slot ─────────────────────────────────────────────────────────────
 
 function EmptySlot({
-  posLabel, isDropTarget, onClick, onDragOver, onDrop,
+  posLabel, isDropTarget, cardW, onClick, onDragOver, onDrop,
 }: {
   posLabel: string;
   isDropTarget: boolean;
+  cardW: number;
   onClick: () => void;
   onDragOver: (e: React.DragEvent) => void;
   onDrop: (e: React.DragEvent) => void;
 }) {
+  const s = cardW / 94;
   return (
     <button
       className="flex flex-col items-center justify-center rounded-sm transition-all"
       style={{
-        width: 94,
-        height: 132,
+        width: cardW,
+        height: Math.round(132 * s),
         border: isDropTarget ? "2px solid #C8A84B" : "2px dashed rgba(255,255,255,0.35)",
         background: isDropTarget ? "rgba(200,168,75,0.15)" : "rgba(255,255,255,0.04)",
         color: isDropTarget ? "#C8A84B" : "rgba(255,255,255,0.5)",
@@ -266,8 +266,8 @@ function EmptySlot({
       onDragOver={onDragOver}
       onDrop={onDrop}
     >
-      <span className="font-black mb-1" style={{ fontSize: 22 }}>+</span>
-      <span className="font-bold tracking-widest uppercase" style={{ fontSize: 9 }}>{posLabel}</span>
+      <span className="font-black" style={{ fontSize: Math.round(22 * s), marginBottom: Math.round(4*s) }}>+</span>
+      <span className="font-bold tracking-widest uppercase" style={{ fontSize: Math.max(6, Math.round(9 * s)) }}>{posLabel}</span>
     </button>
   );
 }
@@ -474,6 +474,19 @@ export default function SquadBuilder({ players }: { players: Player[] }) {
   const [dragSource, setDragSource] = useState<string | null>(null);
   const [dragOver, setDragOver]     = useState<string | null>(null);
   const [copied, setCopied]         = useState(false);
+  const [pitchWidth, setPitchWidth] = useState(700);
+  const pitchRef = useRef<HTMLDivElement>(null);
+
+  // Track pitch container width to scale cards
+  useEffect(() => {
+    if (!pitchRef.current) return;
+    const ro = new ResizeObserver(entries => setPitchWidth(entries[0].contentRect.width));
+    ro.observe(pitchRef.current);
+    return () => ro.disconnect();
+  }, []);
+
+  // cardW: 94px at 700px pitch, scales down linearly, minimum 58px
+  const cardW = Math.max(58, Math.round((pitchWidth / 700) * 94));
 
   // Load formation + squad from URL on first render
   useEffect(() => {
@@ -602,6 +615,7 @@ export default function SquadBuilder({ players }: { players: Player[] }) {
           {/* ── Football pitch + controls ────────────────────────────────── */}
           <div className="w-full flex flex-col items-center">
             <div
+              ref={pitchRef}
               className="relative rounded-xl overflow-hidden shadow-2xl w-full"
               style={{
                 maxWidth: 700,
@@ -633,6 +647,7 @@ export default function SquadBuilder({ players }: { players: Player[] }) {
                         posLabel={pos.label}
                         isDragging={isDragging}
                         isDropTarget={isDropTarget}
+                        cardW={cardW}
                         onRemove={() => removePlayer(pos.id)}
                         onDragStart={e => handleDragStart(e, pos.id)}
                         onDragEnd={handleDragEnd}
@@ -643,6 +658,7 @@ export default function SquadBuilder({ players }: { players: Player[] }) {
                       <EmptySlot
                         posLabel={pos.label}
                         isDropTarget={isDropTarget}
+                        cardW={cardW}
                         onClick={() => setActiveSlot(pos.id)}
                         onDragOver={e => handleDragOver(e, pos.id)}
                         onDrop={e => handleDrop(e, pos.id)}
