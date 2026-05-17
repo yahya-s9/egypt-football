@@ -59,7 +59,18 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
             </div>
           )}
           <div>
-            <p className="text-eg-red text-xs font-bold tracking-widest uppercase mb-1">🇪🇬 Egypt</p>
+            <div className="flex items-center gap-2 mb-1">
+              <p className="text-eg-red text-xs font-bold tracking-widest uppercase">🇪🇬 Egypt</p>
+              {player.position && (
+                <span className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide ${
+                  player.position === "GK"  ? "bg-amber-100 text-amber-700" :
+                  player.position === "DEF" ? "bg-blue-100 text-blue-700"   :
+                  player.position === "MF"  ? "bg-green-100 text-green-700" :
+                  player.position === "FW"  ? "bg-red-100 text-eg-red"      :
+                  "bg-eg-bg text-eg-muted"
+                }`}>{player.position}</span>
+              )}
+            </div>
             <h1 className="text-3xl sm:text-5xl font-black text-eg-text leading-none mb-1">{player.name}</h1>
             {player.fullName && (
               <p className="text-eg-muted text-sm mb-1">{player.fullName}</p>

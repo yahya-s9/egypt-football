@@ -15,6 +15,7 @@ export type Player = {
   countries: string[];
   photoUrl: string;
   transfermarktUrl: string;
+  position: string;       // GK | DEF | MF | FW
   fullName: string;       // e.g. "Mostafa Ahmed Abdelaziz Mohamed Shobeir" — shown on detail page
   nickname: string;       // e.g. "Oufa" — also accepted in lineup column
   clubs: Club[];

@@ -126,6 +126,7 @@ export async function getPlayers(): Promise<Player[]> {
         goals: goalsFromLineup > 0 ? goalsFromLineup : goalsFromSheet,
         primaryCountry: countries[0] ?? "Egypt",
         countries,
+        position: row.position?.trim().toUpperCase() ?? "",
         photoUrl: row.photoUrl?.trim() ?? "",
         transfermarktUrl: row.transfermarktUrl?.trim() ?? "",
         fullName: row.playerFullName?.trim() ?? "",
