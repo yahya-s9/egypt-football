@@ -124,14 +124,17 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="bg-eg-surface-2 border-b border-eg-border">
-                  {["Date","Opponent","Score","Result","Competition","Goals / Assists"].map((h, i) => (
-                    <th key={h} className={`px-4 py-3 text-xs font-semibold tracking-widest uppercase text-eg-muted ${h === "Score" || h === "Result" ? "text-center" : "text-left"} ${i === 4 ? "hidden sm:table-cell" : ""}`}>{h}</th>
+                  {["Date","Opponent","Score","Result","Competition","Role","Goals"].map((h, i) => (
+                    <th key={h} className={`px-4 py-3 text-xs font-semibold tracking-widest uppercase text-eg-muted ${h === "Score" || h === "Result" ? "text-center" : "text-left"} ${i === 4 ? "hidden sm:table-cell" : ""} ${i === 5 ? "hidden sm:table-cell" : ""}`}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {player.appearances.map((m, i) => {
-                  const entry = m.lineup.find(e => toSlug(e.playerName) === slug);
+                  const lineupEntry = m.lineup.find(e => toSlug(e.playerName) === slug);
+                  const subEntry    = m.subs.find(e => toSlug(e.playerName) === slug);
+                  const entry = lineupEntry ?? subEntry;
+                  const isSub = !lineupEntry && !!subEntry;
                   return (
                     <tr key={m.id} className={`border-b border-eg-border last:border-0 hover:bg-eg-surface-2 transition-colors ${i % 2 === 1 ? "bg-eg-bg/40" : ""}`}>
                       <td className="px-4 py-3 text-eg-muted text-xs tabular-nums whitespace-nowrap">{formatDate(m.date)}</td>
@@ -139,9 +142,15 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
                       <td className="px-4 py-3 text-center font-black tabular-nums">{m.egyptGoals}–{m.opponentGoals}</td>
                       <td className="px-4 py-3 text-center"><ResultBadge eg={m.egyptGoals} opp={m.opponentGoals} /></td>
                       <td className="px-4 py-3 text-eg-muted text-xs hidden sm:table-cell">{m.competition}</td>
+                      <td className="px-4 py-3 text-xs hidden sm:table-cell">
+                        {isSub
+                          ? <span className="bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wide">Sub</span>
+                          : <span className="bg-green-100 text-green-700 font-semibold px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wide">Started</span>
+                        }
+                      </td>
                       <td className="px-4 py-3 text-xs">
                         {entry && entry.goals > 0
-                          ? <span className="font-semibold text-eg-text">⚽ {entry.goals > 1 ? `×${entry.goals}` : ""}</span>
+                          ? <span className="font-semibold text-eg-text">⚽{entry.goals > 1 ? ` ×${entry.goals}` : ""}</span>
                           : <span className="text-eg-subtle">—</span>
                         }
                       </td>

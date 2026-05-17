@@ -50,6 +50,7 @@ export async function getMatches(): Promise<Match[]> {
       city: row.city?.trim() ?? "",
       isHome: ["true", "yes", "1"].includes((row.isHome ?? "").toLowerCase()),
       lineup: parseLineup(row.lineup ?? ""),
+      subs:   parseLineup(row.subs   ?? ""),
     }))
     .sort((a, b) => b.date.localeCompare(a.date));
 }
@@ -68,13 +69,17 @@ export async function getPlayers(): Promise<Player[]> {
     getMatches(),
   ]);
 
-  // Count appearances per player name slug from lineup data
+  // Count appearances per player from lineup + subs (1 cap per match, regardless of role)
   const capCounts: Record<string, number> = {};
   const goalCounts: Record<string, number> = {};
   for (const m of matches) {
-    for (const e of m.lineup) {
+    const seenThisMatch = new Set<string>();
+    for (const e of [...m.lineup, ...m.subs]) {
       const key = toSlug(e.playerName);
-      capCounts[key] = (capCounts[key] ?? 0) + 1;
+      if (!seenThisMatch.has(key)) {
+        seenThisMatch.add(key);
+        capCounts[key] = (capCounts[key] ?? 0) + 1;
+      }
       goalCounts[key] = (goalCounts[key] ?? 0) + e.goals;
     }
   }
@@ -122,7 +127,8 @@ export async function getPlayerBySlug(slug: string): Promise<PlayerWithAppearanc
   const player = players.find(p => p.id === slug);
   if (!player) return null;
   const appearances = matches.filter(m =>
-    m.lineup.some(e => toSlug(e.playerName) === slug)
+    m.lineup.some(e => toSlug(e.playerName) === slug) ||
+    m.subs.some(e => toSlug(e.playerName) === slug)
   );
   return { ...player, appearances };
 }

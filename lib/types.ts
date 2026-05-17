@@ -36,7 +36,8 @@ export type Match = {
   venue: string;
   city: string;
   isHome: boolean;
-  lineup: LineupEntry[];  // parsed from the "lineup" column
+  lineup: LineupEntry[];  // parsed from the "lineup" column — starting XI
+  subs: LineupEntry[];    // parsed from the "subs" column — substitutes
 };
 
 export type MatchWithScorers = Match; // lineup already contains scorer info
