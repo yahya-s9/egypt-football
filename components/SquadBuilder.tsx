@@ -460,9 +460,9 @@ export default function SquadBuilder({ players }: { players: Player[] }) {
       </div>
 
       <main className="px-4 sm:px-6 py-8">
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col lg:flex-row gap-6 items-start justify-center">
 
-          {/* ── Football pitch ──────────────────────────────────────────── */}
+          {/* ── Football pitch + controls ────────────────────────────────── */}
           <div className="w-full flex flex-col items-center">
             <div
               className="relative rounded-xl overflow-hidden shadow-2xl w-full"
@@ -535,48 +535,49 @@ export default function SquadBuilder({ players }: { players: Player[] }) {
             <p className="text-eg-muted text-xs mt-3 text-center">
               Click a slot to add a player · Drag cards to swap positions
             </p>
+          </div>
 
-            {/* ── Squad list (below pitch) ──────────────────────────────── */}
-            <div className="w-full mt-6 bg-white rounded-xl border border-eg-border shadow-sm overflow-hidden" style={{ maxWidth: 700 }}>
-              <div className="h-1 bg-eg-red" />
-              <div className="px-5 py-3 border-b border-eg-border flex items-center justify-between">
-                <h2 className="section-heading">Your Squad</h2>
-                <span className="text-xs text-eg-muted">{filledCount} / 11 players</span>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-                {POSITIONS.map((pos, i) => {
-                  const player = squad[pos.id];
-                  return (
-                    <div
-                      key={pos.id}
-                      className={`flex items-center gap-2.5 px-4 py-2.5 border-b border-eg-border hover:bg-eg-surface-2 transition-colors cursor-pointer ${i % 2 === 0 ? "" : "border-l border-eg-border"}`}
-                      onClick={() => setActiveSlot(pos.id)}
-                    >
-                      <span className="text-eg-red font-black text-xs w-8 shrink-0">{pos.label}</span>
-                      {player ? (
-                        <>
-                          <div className="w-6 h-6 rounded-full overflow-hidden bg-eg-bg border border-eg-border shrink-0 flex items-center justify-center">
-                            {player.photoUrl ? (
-                              <img src={player.photoUrl} alt={player.name} className="w-full h-full object-cover object-top" />
-                            ) : (
-                              <span className="text-[8px] font-black text-eg-muted">
-                                {player.name.split(" ").map((w: string) => w[0]).join("").slice(0, 2)}
-                              </span>
-                            )}
-                          </div>
-                          <span className="font-semibold text-xs text-eg-text flex-1 truncate">{player.name}</span>
-                          <button
-                            className="text-eg-subtle hover:text-eg-red transition-colors text-sm shrink-0 ml-1"
-                            onClick={e => { e.stopPropagation(); removePlayer(pos.id); }}
-                          >×</button>
-                        </>
-                      ) : (
-                        <span className="text-eg-subtle text-xs italic">Empty</span>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+          {/* ── Squad list — right on desktop, below on mobile ───────────── */}
+          <div className="w-full lg:w-64 shrink-0 bg-white rounded-xl border border-eg-border shadow-sm overflow-hidden">
+            <div className="h-1 bg-eg-red" />
+            <div className="px-4 py-3 border-b border-eg-border flex items-center justify-between">
+              <h2 className="section-heading">Your Squad</h2>
+              <span className="text-xs text-eg-muted">{filledCount}/11</span>
+            </div>
+            {/* Single column on desktop (right panel), two columns on mobile (below pitch) */}
+            <div className="grid grid-cols-2 lg:grid-cols-1">
+              {POSITIONS.map((pos, i) => {
+                const player = squad[pos.id];
+                return (
+                  <div
+                    key={pos.id}
+                    className={`flex items-center gap-2.5 px-4 py-2.5 border-b border-eg-border hover:bg-eg-surface-2 transition-colors cursor-pointer ${i % 2 !== 0 ? "lg:border-l-0 border-l border-eg-border" : ""}`}
+                    onClick={() => setActiveSlot(pos.id)}
+                  >
+                    <span className="text-eg-red font-black text-xs w-8 shrink-0">{pos.label}</span>
+                    {player ? (
+                      <>
+                        <div className="w-6 h-6 rounded-full overflow-hidden bg-eg-bg border border-eg-border shrink-0 flex items-center justify-center">
+                          {player.photoUrl ? (
+                            <img src={player.photoUrl} alt={player.name} className="w-full h-full object-cover object-top" />
+                          ) : (
+                            <span className="text-[8px] font-black text-eg-muted">
+                              {player.name.split(" ").map((w: string) => w[0]).join("").slice(0, 2)}
+                            </span>
+                          )}
+                        </div>
+                        <span className="font-semibold text-xs text-eg-text flex-1 truncate">{player.name}</span>
+                        <button
+                          className="text-eg-subtle hover:text-eg-red transition-colors text-sm shrink-0 ml-1"
+                          onClick={e => { e.stopPropagation(); removePlayer(pos.id); }}
+                        >×</button>
+                      </>
+                    ) : (
+                      <span className="text-eg-subtle text-xs italic">Empty</span>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
 
