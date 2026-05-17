@@ -128,11 +128,12 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
           <h2 className="section-heading mb-3">Club Career</h2>
           <div className="flex flex-wrap gap-2 mt-3">
             {player.clubs.map((c, i) => (
-              <div key={i} className="bg-white border border-eg-border rounded-lg px-4 py-2.5 text-sm shadow-sm">
-                <span className="font-semibold text-eg-text">{c.clubName}</span>
+              <Link key={i} href={`/clubs/${toSlug(c.clubName)}`}
+                className="bg-white border border-eg-border rounded-lg px-4 py-2.5 text-sm shadow-sm hover:border-eg-red/40 hover:shadow-md transition-all">
+                <span className="font-semibold text-eg-text hover:text-eg-red transition-colors">{c.clubName}</span>
                 {c.clubCountry && <span className="text-eg-muted ml-2 text-xs">{c.clubCountry}</span>}
                 {c.yearsActive && <span className="text-eg-subtle ml-2 text-xs">· {c.yearsActive}</span>}
-              </div>
+              </Link>
             ))}
           </div>
         </div>

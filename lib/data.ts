@@ -136,6 +136,39 @@ export async function getPlayers(): Promise<Player[]> {
     });
 }
 
+export async function getPlayersForClub(clubSlug: string): Promise<{
+  clubName: string;
+  players: Array<{ player: Player; yearsActive: string }>;
+} | null> {
+  const players = await getPlayers();
+  let clubName = "";
+  const results: Array<{ player: Player; yearsActive: string }> = [];
+
+  for (const player of players) {
+    for (const club of player.clubs) {
+      if (toSlug(club.clubName) === clubSlug) {
+        if (!clubName) clubName = club.clubName;
+        results.push({ player, yearsActive: club.yearsActive });
+        break;
+      }
+    }
+  }
+
+  if (!clubName) return null;
+  return { clubName, players: results.sort((a, b) => b.player.caps - a.player.caps) };
+}
+
+export async function getAllClubSlugs(): Promise<string[]> {
+  const players = await getPlayers();
+  const seen = new Set<string>();
+  for (const p of players) {
+    for (const c of p.clubs) {
+      if (c.clubName) seen.add(toSlug(c.clubName));
+    }
+  }
+  return [...seen];
+}
+
 export async function getMatchById(id: string): Promise<Match | null> {
   const matches = await getMatches();
   return matches.find(m => m.id === id) ?? null;
