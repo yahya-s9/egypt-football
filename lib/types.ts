@@ -10,6 +10,7 @@ export type Player = {
   birthYear: number;
   birthCity: string;
   caps: number;           // auto-calculated from lineup data; falls back to playerCaps column
+  goals: number;          // auto-calculated from lineup data; falls back to playerGoals column
   primaryCountry: string;
   countries: string[];
   photoUrl: string;

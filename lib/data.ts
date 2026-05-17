@@ -89,15 +89,18 @@ export async function getPlayers(): Promise<Player[]> {
       const clubs = (row.playerClubs ?? "")
         .split(",").map(s => s.trim()).filter(Boolean);
 
-      const capsFromLineup = capCounts[slug] ?? 0;
-      const capsFromSheet  = parseInt(row.playerCaps) || 0;
+      const capsFromLineup  = capCounts[slug]  ?? 0;
+      const goalsFromLineup = goalCounts[slug] ?? 0;
+      const capsFromSheet   = parseInt(row.playerCaps)  || 0;
+      const goalsFromSheet  = parseInt(row.playerGoals) || 0;
 
       return {
         id: slug,
         name,
         birthYear: parseInt(row.playerBirthYear) || 0,
         birthCity: row.playerBirthCity?.trim() ?? "",
-        caps: capsFromLineup > 0 ? capsFromLineup : capsFromSheet,
+        caps:  capsFromLineup  > 0 ? capsFromLineup  : capsFromSheet,
+        goals: goalsFromLineup > 0 ? goalsFromLineup : goalsFromSheet,
         primaryCountry: countries[0] ?? "Egypt",
         countries,
         photoUrl: row.photoUrl?.trim() ?? "",
@@ -133,19 +136,8 @@ export async function getRecords() {
   const draws  = matches.filter(m => m.egyptGoals === m.opponentGoals).length;
   const losses = matches.filter(m => m.egyptGoals < m.opponentGoals).length;
 
-  // Goals per player from lineup data
-  const goalCounts: Record<string, number> = {};
-  for (const m of matches) {
-    for (const e of m.lineup) {
-      if (e.goals > 0) {
-        const key = toSlug(e.playerName);
-        goalCounts[key] = (goalCounts[key] ?? 0) + e.goals;
-      }
-    }
-  }
-
   const topScorers = players
-    .map(p => ({ player: p, goals: goalCounts[p.id] ?? 0 }))
+    .map(p => ({ player: p, goals: p.goals }))
     .filter(x => x.goals > 0)
     .sort((a, b) => b.goals - a.goals)
     .slice(0, 20);

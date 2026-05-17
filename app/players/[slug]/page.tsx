@@ -34,10 +34,6 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
   const player = await getPlayerBySlug(slug);
   if (!player) notFound();
 
-  const totalGoals = player.appearances.reduce((sum, m) => {
-    const entry = m.lineup.find(e => toSlug(e.playerName) === slug);
-    return sum + (entry?.goals ?? 0);
-  }, 0);
   const initials = player.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
 
   return (
@@ -93,7 +89,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
         <div className="border-t border-eg-border grid grid-cols-3 divide-x divide-eg-border bg-eg-surface-2">
           {[
             { label: "Caps",      value: player.caps },
-            { label: "Goals",     value: totalGoals },
+            { label: "Goals",     value: player.goals },
             { label: "In Record", value: player.appearances.length },
           ].map(({ label, value }) => (
             <div key={label} className="text-center py-4 px-4">
