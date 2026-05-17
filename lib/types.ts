@@ -11,6 +11,7 @@ export type Player = {
   birthCity: string;
   caps: number;
   primaryCountry: string;
+  countries: string[];
   photoUrl: string;
   clubs: Club[];
 };

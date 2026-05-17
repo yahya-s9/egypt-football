@@ -36,6 +36,7 @@ export async function getPlayers(): Promise<Player[]> {
         birthCity: row.playerBirthCity?.trim() ?? "",
         caps: parseInt(row.playerCaps) || 0,
         primaryCountry: countries[0] ?? "Egypt",
+        countries,
         photoUrl: row.photoUrl?.trim() ?? "",
         clubs: clubs.map((c) => ({ clubName: c, clubCountry: "", yearsActive: "" })),
       };

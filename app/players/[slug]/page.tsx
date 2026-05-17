@@ -68,7 +68,12 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
               {player.birthYear > 0 && (
                 <span>Born {player.birthYear}{player.birthCity ? `, ${player.birthCity}` : ""}</span>
               )}
-              {player.primaryCountry && <span>Nationality: {player.primaryCountry}</span>}
+              {player.countries.length > 0 && (
+                <span>
+                  {player.countries.length === 1 ? "Nationality" : "Nationalities"}:{" "}
+                  {player.countries.join(" · ")}
+                </span>
+              )}
             </div>
           </div>
         </div>
