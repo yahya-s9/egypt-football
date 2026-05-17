@@ -20,17 +20,17 @@ type Squad = Record<string, AssignedPlayer | null>;
 // x/y as % of pitch container. Attack at top, GK at bottom.
 
 const POSITIONS = [
-  { id: "LW",  label: "LW",  x: 14, y: 10 },
-  { id: "ST",  label: "ST",  x: 50, y: 8  },
-  { id: "RW",  label: "RW",  x: 86, y: 10 },
-  { id: "LCM", label: "LCM", x: 18, y: 36 },
-  { id: "CM",  label: "CM",  x: 50, y: 34 },
-  { id: "RCM", label: "RCM", x: 82, y: 36 },
-  { id: "LB",  label: "LB",  x: 11, y: 61 },
-  { id: "LCB", label: "LCB", x: 31, y: 64 },
-  { id: "RCB", label: "RCB", x: 69, y: 64 },
-  { id: "RB",  label: "RB",  x: 89, y: 61 },
-  { id: "GK",  label: "GK",  x: 50, y: 85 },
+  { id: "LW",  label: "LW",  x: 14, y: 10, playerPos: "FW"  },
+  { id: "ST",  label: "ST",  x: 50, y: 8,  playerPos: "FW"  },
+  { id: "RW",  label: "RW",  x: 86, y: 10, playerPos: "FW"  },
+  { id: "LCM", label: "LCM", x: 18, y: 36, playerPos: "MF"  },
+  { id: "CM",  label: "CM",  x: 50, y: 34, playerPos: "MF"  },
+  { id: "RCM", label: "RCM", x: 82, y: 36, playerPos: "MF"  },
+  { id: "LB",  label: "LB",  x: 11, y: 61, playerPos: "DEF" },
+  { id: "LCB", label: "LCB", x: 31, y: 64, playerPos: "DEF" },
+  { id: "RCB", label: "RCB", x: 69, y: 64, playerPos: "DEF" },
+  { id: "RB",  label: "RB",  x: 89, y: 61, playerPos: "DEF" },
+  { id: "GK",  label: "GK",  x: 50, y: 85, playerPos: "GK"  },
 ];
 
 const EMPTY_SQUAD: Squad = Object.fromEntries(POSITIONS.map(p => [p.id, null]));
@@ -193,16 +193,25 @@ function PitchMarkings() {
 
 // ── Player selector modal ──────────────────────────────────────────────────
 
+const POS_BADGE: Record<string, string> = {
+  GK:  "bg-amber-100 text-amber-700",
+  DEF: "bg-blue-100 text-blue-700",
+  MF:  "bg-green-100 text-green-700",
+  FW:  "bg-red-100 text-eg-red",
+};
+
 function PlayerSelector({
-  players, usedIds, onSelect, onCustom, onClose,
+  players, usedIds, suggestedPos, onSelect, onCustom, onClose,
 }: {
   players: Player[];
   usedIds: Set<string>;
+  suggestedPos: string;
   onSelect: (p: Player) => void;
   onCustom: (name: string) => void;
   onClose: () => void;
 }) {
   const [search, setSearch] = useState("");
+  const [posFilter, setPosFilter] = useState(suggestedPos);
   const [customMode, setCustomMode] = useState(false);
   const [customName, setCustomName] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -210,9 +219,13 @@ function PlayerSelector({
   useEffect(() => { inputRef.current?.focus(); }, []);
 
   const filtered = players
-    .filter(p => p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.clubs.some(c => c.clubName.toLowerCase().includes(search.toLowerCase())))
-    .slice(0, 7);
+    .filter(p =>
+      (posFilter === "all" || !p.position || p.position === posFilter) &&
+      (p.name.toLowerCase().includes(search.toLowerCase()) ||
+       (p.nickname && p.nickname.toLowerCase().includes(search.toLowerCase())) ||
+       p.clubs.some(c => c.clubName.toLowerCase().includes(search.toLowerCase())))
+    )
+    .slice(0, 8);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -230,8 +243,25 @@ function PlayerSelector({
 
         {!customMode ? (
           <>
+            {/* Position filter */}
+            <div className="flex gap-1.5 px-4 pt-3">
+              {["all", "GK", "DEF", "MF", "FW"].map(pos => (
+                <button
+                  key={pos}
+                  onClick={() => setPosFilter(pos)}
+                  className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wide transition-colors ${
+                    posFilter === pos
+                      ? pos === "all" ? "bg-eg-text text-white" : (POS_BADGE[pos] ?? "bg-eg-text text-white")
+                      : "bg-eg-bg text-eg-muted hover:text-eg-text"
+                  }`}
+                >
+                  {pos === "all" ? "All" : pos}
+                </button>
+              ))}
+            </div>
+
             {/* Search */}
-            <div className="px-4 pt-3 pb-2">
+            <div className="px-4 pt-2 pb-2">
               <input
                 ref={inputRef}
                 type="text"
@@ -562,6 +592,7 @@ export default function SquadBuilder({ players }: { players: Player[] }) {
               .filter(([posId, p]) => p && posId !== activeSlot && !p.isCustom)
               .map(([, p]) => p!.id)
           )}
+          suggestedPos={POSITIONS.find(p => p.id === activeSlot)?.playerPos ?? "all"}
           onSelect={assignPlayer}
           onCustom={assignCustom}
           onClose={() => setActiveSlot(null)}
