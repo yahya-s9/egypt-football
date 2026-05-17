@@ -15,7 +15,8 @@ export type Player = {
   countries: string[];
   photoUrl: string;
   transfermarktUrl: string;
-  nickname: string;       // e.g. "Trezeguet" — used to resolve lineup entries
+  fullName: string;       // e.g. "Mostafa Ahmed Abdelaziz Mohamed Shobeir" — shown on detail page
+  nickname: string;       // e.g. "Oufa" — also accepted in lineup column
   clubs: Club[];
 };
 

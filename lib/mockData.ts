@@ -12,6 +12,7 @@ export const MOCK_PLAYERS: Player[] = [
     countries: ["Egypt"],
     photoUrl: "",
     transfermarktUrl: "",
+    fullName: "",
     nickname: "",
     clubs: [
       { clubName: "Al Ahly", clubCountry: "Egypt", yearsActive: "1984–1992" },
@@ -29,6 +30,7 @@ export const MOCK_PLAYERS: Player[] = [
     countries: ["Egypt"],
     photoUrl: "",
     transfermarktUrl: "",
+    fullName: "",
     nickname: "",
     clubs: [
       { clubName: "Zamalek", clubCountry: "Egypt", yearsActive: "1993–2000" },
@@ -47,6 +49,7 @@ export const MOCK_PLAYERS: Player[] = [
     countries: ["Egypt"],
     photoUrl: "",
     transfermarktUrl: "",
+    fullName: "",
     nickname: "",
     clubs: [
       { clubName: "Al Ahly", clubCountry: "Egypt", yearsActive: "1993–2010" },
@@ -63,6 +66,7 @@ export const MOCK_PLAYERS: Player[] = [
     countries: ["Egypt"],
     photoUrl: "",
     transfermarktUrl: "",
+    fullName: "",
     nickname: "",
     clubs: [
       { clubName: "Al Ahly", clubCountry: "Egypt", yearsActive: "2010–2019" },
@@ -79,6 +83,7 @@ export const MOCK_PLAYERS: Player[] = [
     countries: ["Egypt"],
     photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Mohamed_Salah_2018.jpg/220px-Mohamed_Salah_2018.jpg",
     transfermarktUrl: "https://www.transfermarkt.com/mohamed-salah/profil/spieler/148455",
+    fullName: "",
     nickname: "",
     clubs: [
       { clubName: "Liverpool", clubCountry: "England", yearsActive: "2017–2025" },
@@ -95,6 +100,7 @@ export const MOCK_PLAYERS: Player[] = [
     countries: ["Egypt"],
     photoUrl: "",
     transfermarktUrl: "",
+    fullName: "",
     nickname: "",
     clubs: [{ clubName: "Al Ahly", clubCountry: "Egypt", yearsActive: "2000–2012" }],
   },
@@ -109,6 +115,7 @@ export const MOCK_PLAYERS: Player[] = [
     countries: ["Egypt"],
     photoUrl: "",
     transfermarktUrl: "",
+    fullName: "",
     nickname: "",
     clubs: [
       { clubName: "Zamalek", clubCountry: "Egypt", yearsActive: "2002–2007" },
@@ -126,6 +133,7 @@ export const MOCK_PLAYERS: Player[] = [
     countries: ["Egypt"],
     photoUrl: "",
     transfermarktUrl: "",
+    fullName: "",
     nickname: "",
     clubs: [
       { clubName: "Al Ahly", clubCountry: "Egypt", yearsActive: "2000–2007" },
@@ -143,6 +151,7 @@ export const MOCK_PLAYERS: Player[] = [
     countries: ["Egypt"],
     photoUrl: "",
     transfermarktUrl: "",
+    fullName: "",
     nickname: "",
     clubs: [{ clubName: "Al Ahly", clubCountry: "Egypt", yearsActive: "2000–2013" }],
   },
@@ -192,6 +201,7 @@ export const mockSheetData: Record<string, Record<string, string>[]> = {
     playerGoals: String(p.goals),
     photoUrl: p.photoUrl,
     transfermarktUrl: p.transfermarktUrl,
+    playerFullName: p.fullName,
     nickname: p.nickname,
   })),
 };

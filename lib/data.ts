@@ -121,6 +121,7 @@ export async function getPlayers(): Promise<Player[]> {
         countries,
         photoUrl: row.photoUrl?.trim() ?? "",
         transfermarktUrl: row.transfermarktUrl?.trim() ?? "",
+        fullName: row.playerFullName?.trim() ?? "",
         nickname: row.nickname?.trim() ?? "",
         clubs: clubs.map(c => ({ clubName: c, clubCountry: "", yearsActive: "" })),
       };
