@@ -74,6 +74,16 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
                   {player.countries.join(" · ")}
                 </span>
               )}
+              {player.transfermarktUrl && (
+                <a
+                  href={player.transfermarktUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-eg-red hover:underline font-semibold"
+                >
+                  Transfermarkt ↗
+                </a>
+              )}
             </div>
           </div>
         </div>

@@ -38,6 +38,7 @@ export async function getPlayers(): Promise<Player[]> {
         primaryCountry: countries[0] ?? "Egypt",
         countries,
         photoUrl: row.photoUrl?.trim() ?? "",
+        transfermarktUrl: row.transfermarktUrl?.trim() ?? "",
         clubs: clubs.map((c) => ({ clubName: c, clubCountry: "", yearsActive: "" })),
       };
     });

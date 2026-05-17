@@ -13,6 +13,7 @@ export type Player = {
   primaryCountry: string;
   countries: string[];
   photoUrl: string;
+  transfermarktUrl: string;
   clubs: Club[];
 };
 
