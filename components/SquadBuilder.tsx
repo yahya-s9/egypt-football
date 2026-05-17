@@ -16,24 +16,134 @@ type AssignedPlayer = {
 
 type Squad = Record<string, AssignedPlayer | null>;
 
-// ── 4-3-3 formation ────────────────────────────────────────────────────────
+// ── Formations ─────────────────────────────────────────────────────────────
 // x/y as % of pitch container. Attack at top, GK at bottom.
 
-const POSITIONS = [
-  { id: "LW",  label: "LW",  x: 14, y: 10, playerPos: "FW"  },
-  { id: "ST",  label: "ST",  x: 50, y: 8,  playerPos: "FW"  },
-  { id: "RW",  label: "RW",  x: 86, y: 10, playerPos: "FW"  },
-  { id: "LCM", label: "LCM", x: 18, y: 36, playerPos: "MF"  },
-  { id: "CM",  label: "CM",  x: 50, y: 34, playerPos: "MF"  },
-  { id: "RCM", label: "RCM", x: 82, y: 36, playerPos: "MF"  },
-  { id: "LB",  label: "LB",  x: 11, y: 61, playerPos: "DEF" },
-  { id: "LCB", label: "LCB", x: 31, y: 64, playerPos: "DEF" },
-  { id: "RCB", label: "RCB", x: 69, y: 64, playerPos: "DEF" },
-  { id: "RB",  label: "RB",  x: 89, y: 61, playerPos: "DEF" },
-  { id: "GK",  label: "GK",  x: 50, y: 85, playerPos: "GK"  },
+type FormationPos = { id: string; label: string; x: number; y: number; playerPos: string };
+type Formation    = { id: string; name: string; positions: FormationPos[] };
+
+const FORMATIONS: Formation[] = [
+  {
+    id: "4-3-3", name: "4-3-3",
+    positions: [
+      { id: "LW",  label: "LW",  x: 14, y: 10, playerPos: "FW"  },
+      { id: "ST",  label: "ST",  x: 50, y: 8,  playerPos: "FW"  },
+      { id: "RW",  label: "RW",  x: 86, y: 10, playerPos: "FW"  },
+      { id: "LCM", label: "LCM", x: 18, y: 36, playerPos: "MF"  },
+      { id: "CM",  label: "CM",  x: 50, y: 34, playerPos: "MF"  },
+      { id: "RCM", label: "RCM", x: 82, y: 36, playerPos: "MF"  },
+      { id: "LB",  label: "LB",  x: 11, y: 61, playerPos: "DEF" },
+      { id: "LCB", label: "LCB", x: 31, y: 64, playerPos: "DEF" },
+      { id: "RCB", label: "RCB", x: 69, y: 64, playerPos: "DEF" },
+      { id: "RB",  label: "RB",  x: 89, y: 61, playerPos: "DEF" },
+      { id: "GK",  label: "GK",  x: 50, y: 85, playerPos: "GK"  },
+    ],
+  },
+  {
+    id: "4-4-2", name: "4-4-2",
+    positions: [
+      { id: "LS",  label: "LS",  x: 33, y: 12, playerPos: "FW"  },
+      { id: "RS",  label: "RS",  x: 67, y: 12, playerPos: "FW"  },
+      { id: "LM",  label: "LM",  x: 10, y: 42, playerPos: "MF"  },
+      { id: "LCM", label: "LCM", x: 34, y: 40, playerPos: "MF"  },
+      { id: "RCM", label: "RCM", x: 66, y: 40, playerPos: "MF"  },
+      { id: "RM",  label: "RM",  x: 90, y: 42, playerPos: "MF"  },
+      { id: "LB",  label: "LB",  x: 11, y: 64, playerPos: "DEF" },
+      { id: "LCB", label: "LCB", x: 32, y: 67, playerPos: "DEF" },
+      { id: "RCB", label: "RCB", x: 68, y: 67, playerPos: "DEF" },
+      { id: "RB",  label: "RB",  x: 89, y: 64, playerPos: "DEF" },
+      { id: "GK",  label: "GK",  x: 50, y: 85, playerPos: "GK"  },
+    ],
+  },
+  {
+    id: "4-2-3-1", name: "4-2-3-1",
+    positions: [
+      { id: "ST",  label: "ST",  x: 50, y: 9,  playerPos: "FW"  },
+      { id: "LAM", label: "LAM", x: 18, y: 28, playerPos: "MF"  },
+      { id: "CAM", label: "CAM", x: 50, y: 26, playerPos: "MF"  },
+      { id: "RAM", label: "RAM", x: 82, y: 28, playerPos: "MF"  },
+      { id: "LDM", label: "LDM", x: 34, y: 50, playerPos: "MF"  },
+      { id: "RDM", label: "RDM", x: 66, y: 50, playerPos: "MF"  },
+      { id: "LB",  label: "LB",  x: 11, y: 66, playerPos: "DEF" },
+      { id: "LCB", label: "LCB", x: 32, y: 69, playerPos: "DEF" },
+      { id: "RCB", label: "RCB", x: 68, y: 69, playerPos: "DEF" },
+      { id: "RB",  label: "RB",  x: 89, y: 66, playerPos: "DEF" },
+      { id: "GK",  label: "GK",  x: 50, y: 85, playerPos: "GK"  },
+    ],
+  },
+  {
+    id: "3-5-2", name: "3-5-2",
+    positions: [
+      { id: "LS",  label: "LS",  x: 33, y: 10, playerPos: "FW"  },
+      { id: "RS",  label: "RS",  x: 67, y: 10, playerPos: "FW"  },
+      { id: "LM",  label: "LM",  x: 9,  y: 40, playerPos: "MF"  },
+      { id: "LCM", label: "LCM", x: 29, y: 38, playerPos: "MF"  },
+      { id: "CM",  label: "CM",  x: 50, y: 36, playerPos: "MF"  },
+      { id: "RCM", label: "RCM", x: 71, y: 38, playerPos: "MF"  },
+      { id: "RM",  label: "RM",  x: 91, y: 40, playerPos: "MF"  },
+      { id: "LCB", label: "LCB", x: 22, y: 68, playerPos: "DEF" },
+      { id: "CB",  label: "CB",  x: 50, y: 70, playerPos: "DEF" },
+      { id: "RCB", label: "RCB", x: 78, y: 68, playerPos: "DEF" },
+      { id: "GK",  label: "GK",  x: 50, y: 85, playerPos: "GK"  },
+    ],
+  },
+  {
+    id: "5-3-2", name: "5-3-2",
+    positions: [
+      { id: "LS",  label: "LS",  x: 33, y: 10, playerPos: "FW"  },
+      { id: "RS",  label: "RS",  x: 67, y: 10, playerPos: "FW"  },
+      { id: "LCM", label: "LCM", x: 22, y: 40, playerPos: "MF"  },
+      { id: "CM",  label: "CM",  x: 50, y: 38, playerPos: "MF"  },
+      { id: "RCM", label: "RCM", x: 78, y: 40, playerPos: "MF"  },
+      { id: "LWB", label: "LWB", x: 8,  y: 62, playerPos: "DEF" },
+      { id: "LCB", label: "LCB", x: 27, y: 68, playerPos: "DEF" },
+      { id: "CB",  label: "CB",  x: 50, y: 70, playerPos: "DEF" },
+      { id: "RCB", label: "RCB", x: 73, y: 68, playerPos: "DEF" },
+      { id: "RWB", label: "RWB", x: 92, y: 62, playerPos: "DEF" },
+      { id: "GK",  label: "GK",  x: 50, y: 85, playerPos: "GK"  },
+    ],
+  },
+  {
+    id: "3-4-3", name: "3-4-3",
+    positions: [
+      { id: "LW",  label: "LW",  x: 16, y: 10, playerPos: "FW"  },
+      { id: "ST",  label: "ST",  x: 50, y: 8,  playerPos: "FW"  },
+      { id: "RW",  label: "RW",  x: 84, y: 10, playerPos: "FW"  },
+      { id: "LM",  label: "LM",  x: 10, y: 40, playerPos: "MF"  },
+      { id: "LCM", label: "LCM", x: 35, y: 38, playerPos: "MF"  },
+      { id: "RCM", label: "RCM", x: 65, y: 38, playerPos: "MF"  },
+      { id: "RM",  label: "RM",  x: 90, y: 40, playerPos: "MF"  },
+      { id: "LCB", label: "LCB", x: 22, y: 68, playerPos: "DEF" },
+      { id: "CB",  label: "CB",  x: 50, y: 70, playerPos: "DEF" },
+      { id: "RCB", label: "RCB", x: 78, y: 68, playerPos: "DEF" },
+      { id: "GK",  label: "GK",  x: 50, y: 85, playerPos: "GK"  },
+    ],
+  },
 ];
 
-const EMPTY_SQUAD: Squad = Object.fromEntries(POSITIONS.map(p => [p.id, null]));
+const DEFAULT_FORMATION = FORMATIONS[0];
+
+function emptySquad(formation: Formation): Squad {
+  return Object.fromEntries(formation.positions.map(p => [p.id, null]));
+}
+
+// Migrate players to a new formation by matching position types in order
+function migrateSquad(oldFormation: Formation, newFormation: Formation, oldSquad: Squad): Squad {
+  const byType: Record<string, AssignedPlayer[]> = { GK: [], DEF: [], MF: [], FW: [] };
+  for (const pos of oldFormation.positions) {
+    const player = oldSquad[pos.id];
+    if (player) byType[pos.playerPos]?.push(player);
+  }
+  const idxByType: Record<string, number> = { GK: 0, DEF: 0, MF: 0, FW: 0 };
+  const newSquad: Squad = {};
+  for (const pos of newFormation.positions) {
+    const pool = byType[pos.playerPos] ?? [];
+    const idx  = idxByType[pos.playerPos] ?? 0;
+    newSquad[pos.id] = pool[idx] ?? null;
+    idxByType[pos.playerPos] = idx + 1;
+  }
+  return newSquad;
+}
 
 function fromPlayer(p: Player): AssignedPlayer {
   return {
@@ -358,18 +468,30 @@ function PlayerSelector({
 // ── Main component ─────────────────────────────────────────────────────────
 
 export default function SquadBuilder({ players }: { players: Player[] }) {
-  const [squad, setSquad] = useState<Squad>(EMPTY_SQUAD);
+  const [formation, setFormation] = useState<Formation>(DEFAULT_FORMATION);
+  const [squad, setSquad]         = useState<Squad>(() => emptySquad(DEFAULT_FORMATION));
   const [activeSlot, setActiveSlot] = useState<string | null>(null);
   const [dragSource, setDragSource] = useState<string | null>(null);
-  const [dragOver, setDragOver] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [dragOver, setDragOver]     = useState<string | null>(null);
+  const [copied, setCopied]         = useState(false);
 
-  // Load squad from URL on first render
+  // Load formation + squad from URL on first render
   useEffect(() => {
     const s = new URLSearchParams(window.location.search).get("s");
     if (!s) return;
-    try { setSquad({ ...EMPTY_SQUAD, ...JSON.parse(atob(s)) }); } catch {}
+    try {
+      const parsed = JSON.parse(atob(s));
+      const savedFormation = FORMATIONS.find(f => f.id === parsed.formation) ?? DEFAULT_FORMATION;
+      setFormation(savedFormation);
+      setSquad({ ...emptySquad(savedFormation), ...parsed.squad });
+    } catch {}
   }, []);
+
+  function switchFormation(newFormation: Formation) {
+    setSquad(prev => migrateSquad(formation, newFormation, prev));
+    setFormation(newFormation);
+    setActiveSlot(null);
+  }
 
   // ── Assign / remove ──────────────────────────────────────────────────────
 
@@ -426,7 +548,7 @@ export default function SquadBuilder({ players }: { players: Player[] }) {
   // ── Share ────────────────────────────────────────────────────────────────
 
   function handleShare() {
-    const encoded = btoa(JSON.stringify(squad));
+    const encoded = btoa(JSON.stringify({ formation: formation.id, squad }));
     const url = `${window.location.origin}/squad-builder?s=${encoded}`;
     window.history.replaceState(null, "", `/squad-builder?s=${encoded}`);
     navigator.clipboard.writeText(url).then(() => {
@@ -436,7 +558,7 @@ export default function SquadBuilder({ players }: { players: Player[] }) {
   }
 
   function handleClear() {
-    setSquad(EMPTY_SQUAD);
+    setSquad(emptySquad(formation));
     window.history.replaceState(null, "", "/squad-builder");
   }
 
@@ -450,7 +572,22 @@ export default function SquadBuilder({ players }: { players: Player[] }) {
           <div>
             <p className="text-red-200 text-xs font-semibold tracking-[0.3em] uppercase mb-1">Egypt Football</p>
             <h1 className="text-white font-black text-3xl sm:text-4xl leading-none tracking-tight">Squad Builder</h1>
-            <p className="text-red-200 text-sm mt-1">4-3-3 Formation</p>
+            {/* Formation selector */}
+            <div className="flex flex-wrap gap-1.5 mt-3">
+              {FORMATIONS.map(f => (
+                <button
+                  key={f.id}
+                  onClick={() => switchFormation(f)}
+                  className={`text-xs font-bold px-3 py-1 rounded-full tracking-wide transition-colors ${
+                    formation.id === f.id
+                      ? "bg-white text-eg-red"
+                      : "bg-white/15 text-white hover:bg-white/25"
+                  }`}
+                >
+                  {f.name}
+                </button>
+              ))}
+            </div>
           </div>
           <div className="text-right">
             <div className="text-white font-black text-4xl">{filledCount}<span className="text-red-300 text-xl">/11</span></div>
@@ -475,7 +612,7 @@ export default function SquadBuilder({ players }: { players: Player[] }) {
               <PitchMarkings />
 
               {/* Position slots */}
-              {POSITIONS.map(pos => {
+              {formation.positions.map(pos => {
                 const player = squad[pos.id];
                 const isDragging = dragSource === pos.id;
                 const isDropTarget = dragOver === pos.id && dragSource !== pos.id;
@@ -546,7 +683,7 @@ export default function SquadBuilder({ players }: { players: Player[] }) {
             </div>
             {/* Single column on desktop (right panel), two columns on mobile (below pitch) */}
             <div className="grid grid-cols-2 lg:grid-cols-1">
-              {POSITIONS.map((pos, i) => {
+              {formation.positions.map((pos, i) => {
                 const player = squad[pos.id];
                 return (
                   <div
@@ -593,7 +730,7 @@ export default function SquadBuilder({ players }: { players: Player[] }) {
               .filter(([posId, p]) => p && posId !== activeSlot && !p.isCustom)
               .map(([, p]) => p!.id)
           )}
-          suggestedPos={POSITIONS.find(p => p.id === activeSlot)?.playerPos ?? "all"}
+          suggestedPos={formation.positions.find(p => p.id === activeSlot)?.playerPos ?? "all"}
           onSelect={assignPlayer}
           onCustom={assignCustom}
           onClose={() => setActiveSlot(null)}
