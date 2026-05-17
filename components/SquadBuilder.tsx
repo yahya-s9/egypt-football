@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import type { Player } from "@/lib/types";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -122,6 +122,54 @@ const FORMATIONS: Formation[] = [
 ];
 
 const DEFAULT_FORMATION = FORMATIONS[0];
+
+// ── Collision resolver ─────────────────────────────────────────────────────
+// Groups positions into rows (similar y), then pushes cards apart horizontally
+// so none overlap or go off the pitch edges.
+
+function resolveCollisions(
+  positions: FormationPos[],
+  pitchWidth: number,
+  cardW: number,
+): Record<string, number> {
+  const outerW = cardW + 8;  // card + 4px padding each side
+  const halfW  = outerW / 2;
+
+  // Group into rows: positions within 14% y of each other
+  const visited = new Set<string>();
+  const rows: FormationPos[][] = [];
+  for (const pos of [...positions].sort((a, b) => a.y - b.y)) {
+    if (visited.has(pos.id)) continue;
+    const row = positions
+      .filter(p => !visited.has(p.id) && Math.abs(p.y - pos.y) <= 14)
+      .sort((a, b) => a.x - b.x);
+    row.forEach(p => visited.add(p.id));
+    rows.push(row);
+  }
+
+  const adjusted: Record<string, number> = {};
+
+  for (const row of rows) {
+    // Work in pixels
+    let xs = row.map(p => (p.x / 100) * pitchWidth);
+
+    // Push pairs apart left-to-right
+    for (let i = 1; i < xs.length; i++) {
+      if (xs[i] - xs[i - 1] < outerW) xs[i] = xs[i - 1] + outerW;
+    }
+    // Shift left if rightmost is off-screen
+    const overflow = xs[xs.length - 1] + halfW - pitchWidth;
+    if (overflow > 0) xs = xs.map(x => x - overflow);
+    // Clamp leftmost to stay in bounds
+    if (xs[0] - halfW < 0) { const d = halfW - xs[0]; xs = xs.map(x => x + d); }
+
+    row.forEach((pos, i) => {
+      adjusted[pos.id] = (xs[i] / pitchWidth) * 100;
+    });
+  }
+
+  return adjusted;
+}
 
 function emptySquad(formation: Formation): Squad {
   return Object.fromEntries(formation.positions.map(p => [p.id, null]));
@@ -488,6 +536,12 @@ export default function SquadBuilder({ players }: { players: Player[] }) {
   // cardW: 94px at 700px pitch, scales down linearly, minimum 58px
   const cardW = Math.max(58, Math.round((pitchWidth / 700) * 94));
 
+  // Adjusted x% for each position slot — pushes cards apart if they'd overlap
+  const adjustedX = useMemo(
+    () => resolveCollisions(formation.positions, pitchWidth, cardW),
+    [formation.positions, pitchWidth, cardW],
+  );
+
   // Load formation + squad from URL on first render
   useEffect(() => {
     const s = new URLSearchParams(window.location.search).get("s");
@@ -636,9 +690,10 @@ export default function SquadBuilder({ players }: { players: Player[] }) {
                     key={pos.id}
                     className="absolute"
                     style={{
-                      left: `${pos.x}%`,
+                      left: `${adjustedX[pos.id] ?? pos.x}%`,
                       top: `${pos.y}%`,
                       transform: "translateX(-50%)",
+                      transition: "left 0.2s ease",
                     }}
                   >
                     {player ? (
