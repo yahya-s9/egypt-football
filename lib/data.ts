@@ -69,13 +69,24 @@ export async function getPlayers(): Promise<Player[]> {
     getMatches(),
   ]);
 
+  // Build name → player ID map (includes nickname aliases)
+  // e.g. "trezeguet" → "mahmoud-ahmed-ibrahim-hassan"
+  const nameMap: Record<string, string> = {};
+  for (const row of playerRows) {
+    if (!row.playerName?.trim()) continue;
+    const slug = toSlug(row.playerName.trim());
+    nameMap[slug] = slug;
+    const nick = row.nickname?.trim();
+    if (nick) nameMap[toSlug(nick)] = slug;
+  }
+
   // Count appearances per player from lineup + subs (1 cap per match, regardless of role)
   const capCounts: Record<string, number> = {};
   const goalCounts: Record<string, number> = {};
   for (const m of matches) {
     const seenThisMatch = new Set<string>();
     for (const e of [...m.lineup, ...m.subs]) {
-      const key = toSlug(e.playerName);
+      const key = nameMap[toSlug(e.playerName)] ?? toSlug(e.playerName);
       if (!seenThisMatch.has(key)) {
         seenThisMatch.add(key);
         capCounts[key] = (capCounts[key] ?? 0) + 1;
@@ -110,6 +121,7 @@ export async function getPlayers(): Promise<Player[]> {
         countries,
         photoUrl: row.photoUrl?.trim() ?? "",
         transfermarktUrl: row.transfermarktUrl?.trim() ?? "",
+        nickname: row.nickname?.trim() ?? "",
         clubs: clubs.map(c => ({ clubName: c, clubCountry: "", yearsActive: "" })),
       };
     });
@@ -126,9 +138,19 @@ export async function getPlayerBySlug(slug: string): Promise<PlayerWithAppearanc
   const [players, matches] = await Promise.all([getPlayers(), getMatches()]);
   const player = players.find(p => p.id === slug);
   if (!player) return null;
+
+  // Build name map so nickname entries in lineups resolve to this player
+  const nameMap: Record<string, string> = {};
+  for (const p of players) {
+    nameMap[p.id] = p.id;
+    if (p.nickname) nameMap[toSlug(p.nickname)] = p.id;
+  }
+
+  const resolve = (name: string) => nameMap[toSlug(name)] ?? toSlug(name);
+
   const appearances = matches.filter(m =>
-    m.lineup.some(e => toSlug(e.playerName) === slug) ||
-    m.subs.some(e => toSlug(e.playerName) === slug)
+    m.lineup.some(e => resolve(e.playerName) === slug) ||
+    m.subs.some(e => resolve(e.playerName) === slug)
   );
   return { ...player, appearances };
 }

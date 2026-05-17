@@ -15,6 +15,7 @@ export type Player = {
   countries: string[];
   photoUrl: string;
   transfermarktUrl: string;
+  nickname: string;       // e.g. "Trezeguet" — used to resolve lineup entries
   clubs: Club[];
 };
 

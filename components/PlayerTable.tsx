@@ -17,6 +17,7 @@ export default function PlayerTable({ players }: { players: Player[] }) {
     return players
       .filter(p =>
         p.name.toLowerCase().includes(q) ||
+        p.nickname.toLowerCase().includes(q) ||
         p.birthCity.toLowerCase().includes(q) ||
         p.clubs.some(c => c.clubName.toLowerCase().includes(q))
       )
@@ -82,6 +83,9 @@ export default function PlayerTable({ players }: { players: Player[] }) {
                   <Link href={`/players/${toSlug(player.name)}`} className="text-eg-text hover:text-eg-red transition-colors">
                     {player.name}
                   </Link>
+                  {player.nickname && (
+                    <span className="ml-2 text-eg-muted text-xs">"{player.nickname}"</span>
+                  )}
                 </td>
                 <td className="px-4 py-3 text-eg-muted tabular-nums">{player.birthYear || "—"}</td>
                 <td className="px-4 py-3 text-eg-muted hidden sm:table-cell">{player.birthCity || "—"}</td>
