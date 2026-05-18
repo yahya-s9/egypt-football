@@ -52,7 +52,10 @@ export default async function ClubPage({ params }: { params: Promise<{ slug: str
             <p className="text-eg-red text-xs font-bold tracking-widest uppercase mb-1">Club</p>
             <h1 className="text-3xl sm:text-4xl font-black text-eg-text leading-none">{clubName}</h1>
             <p className="text-eg-muted text-sm mt-2">
-              {players.length} Egyptian {players.length === 1 ? "player" : "players"} represented this club
+              {clubName === "Retired"
+                ? `${players.length} Egyptian ${players.length === 1 ? "player has" : "players have"} retired`
+                : `${players.length} Egyptian ${players.length === 1 ? "player" : "players"} represented this club`
+              }
             </p>
           </div>
         </div>
