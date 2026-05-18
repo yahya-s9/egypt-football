@@ -7,6 +7,11 @@ import { toSlug } from "@/lib/data";
 
 type SortKey = "name" | "caps" | "birthYear" | "position";
 
+function eraLabel(start: string, end: string) {
+  if (!start) return "—";
+  return end && end !== start ? `${start}–${end}` : `${start}–`;
+}
+
 const POSITION_BADGE: Record<string, string> = {
   GK:  "bg-amber-100 text-amber-700",
   DEF: "bg-blue-100 text-blue-700",
@@ -102,13 +107,14 @@ export default function PlayerTable({ players }: { players: Player[] }) {
               <th className="px-4 py-3 text-right text-xs font-semibold tracking-widest uppercase text-eg-muted cursor-pointer hover:text-eg-text select-none" onClick={() => toggleSort("caps")}>
                 Caps <Arrow col="caps" />
               </th>
+              <th className="px-4 py-3 text-left text-xs font-semibold tracking-widest uppercase text-eg-muted hidden sm:table-cell">Era</th>
               <th className="px-4 py-3 text-left text-xs font-semibold tracking-widest uppercase text-eg-muted hidden md:table-cell">Clubs</th>
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-12 text-center text-eg-muted text-sm">No players found.</td>
+                <td colSpan={8} className="px-4 py-12 text-center text-eg-muted text-sm">No players found.</td>
               </tr>
             )}
             {filtered.map((player, i) => (
@@ -129,6 +135,9 @@ export default function PlayerTable({ players }: { players: Player[] }) {
                   <span className="inline-block bg-eg-red text-white font-bold text-xs px-2.5 py-0.5 rounded-full tabular-nums">
                     {player.caps}
                   </span>
+                </td>
+                <td className="px-4 py-3 text-eg-muted text-xs tabular-nums hidden sm:table-cell whitespace-nowrap">
+                  {eraLabel(player.careerStart, player.careerEnd)}
                 </td>
                 <td className="px-4 py-3 text-eg-muted text-xs hidden md:table-cell">
                   {player.clubs.map(c => c.clubName).join(", ") || "—"}

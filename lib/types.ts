@@ -16,6 +16,8 @@ export type Player = {
   photoUrl: string;
   transfermarktUrl: string;
   position: string;       // GK | DEF | MF | FW
+  careerStart: string;    // e.g. "1985" — first Egypt appearance
+  careerEnd: string;      // e.g. "2006" — last Egypt appearance ("" = still active)
   fullName: string;       // e.g. "Mostafa Ahmed Abdelaziz Mohamed Shobeir" — shown on detail page
   nickname: string;       // e.g. "Oufa" — also accepted in lineup column
   clubs: Club[];

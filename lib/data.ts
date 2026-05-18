@@ -87,9 +87,12 @@ export async function getPlayers(): Promise<Player[]> {
     if (nick) nameMap[toSlug(nick)] = slug;
   }
 
-  // Count appearances per player from lineup + subs (1 cap per match, regardless of role)
-  const capCounts: Record<string, number> = {};
-  const goalCounts: Record<string, number> = {};
+  // Count appearances, goals, and track career span per player
+  const capCounts:   Record<string, number> = {};
+  const goalCounts:  Record<string, number> = {};
+  const firstMatch:  Record<string, string> = {};
+  const lastMatch:   Record<string, string> = {};
+
   for (const m of matches) {
     const seenThisMatch = new Set<string>();
     for (const e of [...m.lineup, ...m.subs]) {
@@ -97,6 +100,8 @@ export async function getPlayers(): Promise<Player[]> {
       if (!seenThisMatch.has(key)) {
         seenThisMatch.add(key);
         capCounts[key] = (capCounts[key] ?? 0) + 1;
+        if (!firstMatch[key] || m.date < firstMatch[key]) firstMatch[key] = m.date;
+        if (!lastMatch[key]  || m.date > lastMatch[key])  lastMatch[key]  = m.date;
       }
       goalCounts[key] = (goalCounts[key] ?? 0) + e.goals;
     }
@@ -127,6 +132,8 @@ export async function getPlayers(): Promise<Player[]> {
         primaryCountry: countries[0] ?? "Egypt",
         countries,
         position: row.position?.trim().toUpperCase() ?? "",
+        careerStart: firstMatch[slug]?.slice(0, 4) || row.playerDebutYear?.trim()   || "",
+        careerEnd:   lastMatch[slug]?.slice(0, 4)  || row.playerRetiredYear?.trim() || "",
         photoUrl: row.photoUrl?.trim() ?? "",
         transfermarktUrl: row.transfermarktUrl?.trim() ?? "",
         fullName: row.playerFullName?.trim() ?? "",

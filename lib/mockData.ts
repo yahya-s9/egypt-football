@@ -13,6 +13,8 @@ export const MOCK_PLAYERS: Player[] = [
     photoUrl: "",
     transfermarktUrl: "",
     position: "",
+    careerStart: "",
+    careerEnd: "",
     fullName: "",
     nickname: "",
     clubs: [
@@ -32,6 +34,8 @@ export const MOCK_PLAYERS: Player[] = [
     photoUrl: "",
     transfermarktUrl: "",
     position: "",
+    careerStart: "",
+    careerEnd: "",
     fullName: "",
     nickname: "",
     clubs: [
@@ -52,6 +56,8 @@ export const MOCK_PLAYERS: Player[] = [
     photoUrl: "",
     transfermarktUrl: "",
     position: "",
+    careerStart: "",
+    careerEnd: "",
     fullName: "",
     nickname: "",
     clubs: [
@@ -70,6 +76,8 @@ export const MOCK_PLAYERS: Player[] = [
     photoUrl: "",
     transfermarktUrl: "",
     position: "",
+    careerStart: "",
+    careerEnd: "",
     fullName: "",
     nickname: "",
     clubs: [
@@ -88,6 +96,8 @@ export const MOCK_PLAYERS: Player[] = [
     photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Mohamed_Salah_2018.jpg/220px-Mohamed_Salah_2018.jpg",
     transfermarktUrl: "https://www.transfermarkt.com/mohamed-salah/profil/spieler/148455",
     position: "FW",
+    careerStart: "",
+    careerEnd: "",
     fullName: "",
     nickname: "",
     clubs: [
@@ -106,6 +116,8 @@ export const MOCK_PLAYERS: Player[] = [
     photoUrl: "",
     transfermarktUrl: "",
     position: "",
+    careerStart: "",
+    careerEnd: "",
     fullName: "",
     nickname: "",
     clubs: [{ clubName: "Al Ahly", clubCountry: "Egypt", yearsActive: "2000–2012" }],
@@ -122,6 +134,8 @@ export const MOCK_PLAYERS: Player[] = [
     photoUrl: "",
     transfermarktUrl: "",
     position: "",
+    careerStart: "",
+    careerEnd: "",
     fullName: "",
     nickname: "",
     clubs: [
@@ -141,6 +155,8 @@ export const MOCK_PLAYERS: Player[] = [
     photoUrl: "",
     transfermarktUrl: "",
     position: "",
+    careerStart: "",
+    careerEnd: "",
     fullName: "",
     nickname: "",
     clubs: [
@@ -160,6 +176,8 @@ export const MOCK_PLAYERS: Player[] = [
     photoUrl: "",
     transfermarktUrl: "",
     position: "",
+    careerStart: "",
+    careerEnd: "",
     fullName: "",
     nickname: "",
     clubs: [{ clubName: "Al Ahly", clubCountry: "Egypt", yearsActive: "2000–2013" }],

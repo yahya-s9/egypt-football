@@ -84,6 +84,11 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
               <p className="text-eg-red font-bold text-sm mb-2">"{player.nickname}"</p>
             )}
             <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-eg-muted">
+              {(player.careerStart) && (
+                <span className="font-semibold text-eg-text">
+                  {player.careerStart}{player.careerEnd && player.careerEnd !== player.careerStart ? `–${player.careerEnd}` : "–present"}
+                </span>
+              )}
               {player.birthYear > 0 && (
                 <span>Born {player.birthYear}{player.birthCity ? `, ${player.birthCity}` : ""}</span>
               )}
