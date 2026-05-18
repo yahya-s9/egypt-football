@@ -26,8 +26,8 @@ const API_KEY    = process.env.GOOGLE_API_KEY;
 const TM_API     = process.env.TRANSFERMARKT_API_URL ?? "https://transfermarkt-api-8622.onrender.com";
 const TOKEN_PATH = path.join(__dirname, "token.json");
 const DRY_RUN    = process.argv.includes("--dry-run");
-const MIN_VALUE  = 500_000;  // €500k minimum market value
-const MAX_PAGES  = 5;
+const MIN_VALUE  = 50_000;   // €50k minimum market value
+const MAX_PAGES  = 8;
 const DELAY_MS   = 800;
 
 const SEARCH_TERMS = [

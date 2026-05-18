@@ -112,7 +112,7 @@ export default function PlayerTable({ players }: { players: Player[] }) {
               </tr>
             )}
             {filtered.map((player, i) => (
-              <tr key={player.id} className="border-b border-eg-border last:border-0 hover:bg-eg-surface-2 transition-colors">
+              <tr key={`${player.id}-${i}`} className="border-b border-eg-border last:border-0 hover:bg-eg-surface-2 transition-colors">
                 <td className="px-4 py-3 text-eg-subtle tabular-nums text-xs">{i + 1}</td>
                 <td className="px-4 py-3"><PosBadge pos={player.position} /></td>
                 <td className="px-4 py-3 font-semibold">
